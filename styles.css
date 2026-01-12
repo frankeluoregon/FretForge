@@ -347,7 +347,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .fretboard-container {
-    background: linear-gradient(135deg, #3d1810 0%, #2a1108 100%);
+    background: #1a1108;
     padding: 20px;
     padding-bottom: 60px;
     border-radius: 12px;
@@ -362,6 +362,11 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     grid-template-columns: 60px repeat(13, 1fr); /* Default for 12 frets, overridden by JS */
     gap: 0;
     min-width: 900px;
+    background: linear-gradient(135deg, #3d1810 0%, #2a1108 100%);
+    border: 1px solid rgba(255, 228, 181, 0.15);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .string-label {
