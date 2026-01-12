@@ -512,7 +512,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 
 .fret-number {
     position: absolute;
-    bottom: -30px;
+    bottom: -40px;
     font-size: 0.8em;
     color: #c9a887;
     font-weight: bold;
@@ -520,7 +520,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 
 .fret-inlay {
     position: absolute;
-    bottom: -50px;
+    bottom: -60px;
     width: 12px;
     height: 12px;
     background: #d4a574;
