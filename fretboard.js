@@ -9,6 +9,7 @@ const Fretboard = {
     currentInstrument: 'guitar',
     tuning: ['E', 'B', 'G', 'D', 'A', 'E'],  // Default to guitar
     numFrets: 12,
+    displayFrets: 12,  // For PDF export, can be different from numFrets
 
     /**
      * Set the instrument type
@@ -59,14 +60,14 @@ const Fretboard = {
                     cell.appendChild(fretNum);
 
                     // Add position marker dots
-                    if ([3, 5, 7, 9].includes(fret)) {
+                    if ([3, 5, 7, 9, 15, 17].includes(fret)) {
                         const inlay = document.createElement('div');
                         inlay.className = 'fret-inlay';
                         cell.appendChild(inlay);
                     }
 
-                    // Double dots for 12th fret
-                    if (fret === 12) {
+                    // Double dots for 12th and 24th fret (though 24 is beyond our range)
+                    if ([12, 24].includes(fret)) {
                         const inlay1 = document.createElement('div');
                         inlay1.className = 'fret-inlay';
                         inlay1.style.left = '30%';

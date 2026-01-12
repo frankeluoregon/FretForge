@@ -94,6 +94,16 @@ const App = {
             this.renderFretboards();
         });
 
+        // Fret count selector
+        document.getElementById('num-frets').addEventListener('change', (e) => {
+            Fretboard.numFrets = parseInt(e.target.value);
+            if (this.currentMode === 'fretboard') {
+                this.renderFretboards();
+            } else {
+                this.renderProgressionDisplay();
+            }
+        });
+
         // PDF orientation selector
         document.getElementById('pdf-orientation').addEventListener('change', (e) => {
             this.pdfOrientation = e.target.value;
@@ -509,7 +519,7 @@ const App = {
     /**
      * Draw a fretboard on canvas for PDF export
      */
-    drawFretboardOnCanvas(canvas, chord, chordLabel, nextChordRoot) {
+    drawFretboardOnCanvas(canvas, chord, chordLabel, nextChordRoot, maxFrets) {
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
@@ -529,7 +539,7 @@ const App = {
         const fretboardHeight = height - 160;  // Leave more room for fret numbers (60px instead of 40px)
         const fretboardWidth = width - 100;
         const numStrings = Fretboard.tuning.length;
-        const numFrets = 12;
+        const numFrets = maxFrets;  // Use the passed-in max frets
         const stringSpacing = fretboardHeight / (numStrings - 1);
         const fretSpacing = fretboardWidth / numFrets;
 
@@ -671,6 +681,11 @@ const App = {
             return;
         }
 
+        // Determine max frets based on orientation and current fret count
+        // Portrait: max 12 frets, Landscape: max 20 frets (but respect user's selection if lower)
+        const maxFretsForOrientation = this.pdfOrientation === 'landscape' ? 20 : 12;
+        const maxFrets = Math.min(Fretboard.numFrets, maxFretsForOrientation);
+
         // Create a hidden canvas
         const canvas = document.createElement('canvas');
         canvas.width = 1200;
@@ -703,7 +718,7 @@ const App = {
             }
 
             // Draw fretboard on canvas
-            this.drawFretboardOnCanvas(canvas, chord, chordLabel, nextChordRoot);
+            this.drawFretboardOnCanvas(canvas, chord, chordLabel, nextChordRoot, maxFrets);
 
             // Add canvas to PDF
             const imgData = canvas.toDataURL('image/png');
