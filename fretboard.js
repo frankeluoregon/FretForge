@@ -2,9 +2,13 @@
 const Fretboard = {
     // Tuning configurations
     tunings: {
-        bass4: ['G', 'D', 'A', 'E'],         // 4-string bass
-        bass5: ['G', 'D', 'A', 'E', 'B'],    // 5-string bass (high to low)
-        guitar: ['E', 'B', 'G', 'D', 'A', 'E']  // 6-string guitar (high to low)
+        guitar: ['E', 'B', 'G', 'D', 'A', 'E'],      // 6-string guitar (high to low)
+        bass4: ['G', 'D', 'A', 'E'],                  // 4-string bass
+        bass5: ['G', 'D', 'A', 'E', 'B'],            // 5-string bass (high to low)
+        bass6: ['C', 'G', 'D', 'A', 'E', 'B'],       // 6-string bass (high to low)
+        ukulele: ['A', 'E', 'C', 'G'],                // Ukulele (high to low, reentrant tuning)
+        mandolin: ['E', 'E', 'A', 'A', 'D', 'D', 'G', 'G'],  // Mandolin (4 courses, paired strings)
+        banjo: ['D', 'B', 'G', 'D', 'G']              // 5-string banjo (high to low, with short 5th string)
     },
     currentInstrument: 'guitar',
     tuning: ['E', 'B', 'G', 'D', 'A', 'E'],  // Default to guitar
