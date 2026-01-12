@@ -101,9 +101,15 @@ const App = {
             }
         });
 
-        // Progression mode controls
-        document.getElementById('progression-key').addEventListener('change', (e) => {
-            this.progressionKey = e.target.value;
+        // Progression mode controls - split key selector
+        document.getElementById('progression-key-letter').addEventListener('change', (e) => {
+            const accidental = document.getElementById('progression-key-accidental').value;
+            this.progressionKey = e.target.value + accidental;
+        });
+
+        document.getElementById('progression-key-accidental').addEventListener('change', (e) => {
+            const letter = document.getElementById('progression-key-letter').value;
+            this.progressionKey = letter + e.target.value;
         });
 
         document.getElementById('progression-quality').addEventListener('change', (e) => {
