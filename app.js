@@ -97,6 +97,7 @@ const App = {
         // PDF orientation selector
         document.getElementById('pdf-orientation').addEventListener('change', (e) => {
             this.pdfOrientation = e.target.value;
+            console.log('PDF orientation changed to:', this.pdfOrientation);
         });
 
         // Chord select mode scale notes toggle
@@ -645,7 +646,9 @@ const App = {
      */
     async exportToPDF() {
         const { jsPDF } = window.jspdf;
+        console.log('PDF Orientation:', this.pdfOrientation);
         const orientation = this.pdfOrientation === 'landscape' ? 'l' : 'p';
+        console.log('jsPDF Orientation:', orientation);
         const pdf = new jsPDF(orientation, 'mm', 'a4');
 
         if (this.chords.length === 0) {
