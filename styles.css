@@ -35,11 +35,24 @@ body:has(.top-bar.mobile-static) {
 .top-bar-content {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 15px 20px;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.top-bar-row {
     display: flex;
     align-items: center;
     gap: 30px;
     flex-wrap: wrap;
+}
+
+.top-bar-row.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 15px;
 }
 
 .top-bar h1 {
@@ -78,12 +91,34 @@ body:has(.top-bar.mobile-static) {
     color: #ffe4b5;
 }
 
-.top-controls {
+.top-row-controls {
     display: flex;
     gap: 15px;
     flex: 1;
     justify-content: flex-end;
     flex-wrap: wrap;
+}
+
+.bottom-left-controls,
+.bottom-center-controls,
+.bottom-right-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.bottom-left-controls {
+    flex: 0 0 auto;
+}
+
+.bottom-center-controls {
+    flex: 1;
+    justify-content: center;
+}
+
+.bottom-right-controls {
+    flex: 0 0 auto;
+    justify-content: flex-end;
 }
 
 .input-group {

@@ -104,9 +104,13 @@ const App = {
             }
         });
 
-        // PDF orientation selector
+        // PDF orientation selector - now triggers export on change
         document.getElementById('pdf-orientation').addEventListener('change', (e) => {
             this.pdfOrientation = e.target.value;
+            // Auto-export when orientation is selected
+            this.exportToPDF();
+            // Hide the orientation dropdown after export
+            document.getElementById('pdf-orientation-group').style.display = 'none';
         });
 
         // Zoom slider
@@ -182,9 +186,17 @@ const App = {
             });
         });
 
-        // Export to PDF button
+        // Export to PDF button - now shows orientation selector
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
-            this.exportToPDF();
+            const orientationGroup = document.getElementById('pdf-orientation-group');
+            // Toggle orientation dropdown visibility
+            if (orientationGroup.style.display === 'none') {
+                orientationGroup.style.display = 'flex';
+                // Focus on the select to make it easier to choose
+                document.getElementById('pdf-orientation').focus();
+            } else {
+                orientationGroup.style.display = 'none';
+            }
         });
     },
 
