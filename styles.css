@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #000000;
+    background: #0a0807;
     min-height: 100vh;
     padding-top: 80px;
 }
@@ -26,8 +26,8 @@ body:has(.top-bar.mobile-static) {
     top: 0;
     left: 0;
     right: 0;
-    background: #1a1a1a;
-    border-bottom: 2px solid #333;
+    background: #2a1f1a;
+    border-bottom: 2px solid #5c2f1f;
     z-index: 1000;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
@@ -43,7 +43,7 @@ body:has(.top-bar.mobile-static) {
 }
 
 .top-bar h1 {
-    color: #ffffff;
+    color: #f4a460;
     font-size: 1.8em;
     margin: 0;
     white-space: nowrap;
@@ -52,7 +52,7 @@ body:has(.top-bar.mobile-static) {
 .mode-toggle {
     display: flex;
     gap: 5px;
-    background: #0d0d0d;
+    background: #1a1410;
     padding: 4px;
     border-radius: 8px;
 }
@@ -60,7 +60,7 @@ body:has(.top-bar.mobile-static) {
 .mode-btn {
     padding: 8px 20px;
     background: transparent;
-    color: #999;
+    color: #8d7a6a;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -70,12 +70,12 @@ body:has(.top-bar.mobile-static) {
 }
 
 .mode-btn:hover {
-    color: #ffffff;
+    color: #ffe4b5;
 }
 
 .mode-btn.active {
-    background: #007030;
-    color: #ffffff;
+    background: #8d5524;
+    color: #ffe4b5;
 }
 
 .top-controls {
@@ -94,29 +94,29 @@ body:has(.top-bar.mobile-static) {
 
 .input-group label {
     font-weight: 600;
-    color: #ffffff;
+    color: #c9a887;
     font-size: 0.85em;
     white-space: nowrap;
 }
 
 .input-group select {
     padding: 6px 12px;
-    border: 2px solid #333;
+    border: 2px solid #5c2f1f;
     border-radius: 6px;
     font-size: 0.9em;
-    background: #0d0d0d;
-    color: #ffffff;
+    background: #1a1410;
+    color: #c9a887;
     cursor: pointer;
     transition: border-color 0.3s;
 }
 
 .input-group select:hover {
-    border-color: #007030;
+    border-color: #8d5524;
 }
 
 .input-group select:focus {
     outline: none;
-    border-color: #007030;
+    border-color: #8d5524;
 }
 
 .compact-group select {
@@ -134,14 +134,14 @@ body:has(.top-bar.mobile-static) {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #007030;
+    accent-color: #8d5524;
 }
 
 .export-btn {
     padding: 6px 16px;
-    background: #007030;
-    color: white;
-    border: 2px solid #005020;
+    background: #8d5524;
+    color: #ffe4b5;
+    border: 2px solid #5c2f1f;
     border-radius: 6px;
     font-size: 0.9em;
     font-weight: 600;
@@ -151,7 +151,7 @@ body:has(.top-bar.mobile-static) {
 }
 
 .export-btn:hover {
-    background: #005020;
+    background: #d4722e;
     transform: translateY(-1px);
 }
 
@@ -172,7 +172,7 @@ body:has(.top-bar.mobile-static) {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #ffffff;
+    color: #c9a887;
     font-size: 0.8em;
     white-space: nowrap;
 }
@@ -186,7 +186,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid #333;
+    border: 2px solid #3d2f27;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,21 +195,21 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .legend-marker.chord-tone {
-    background: #FEE11A;
-    color: #007030;
-    border: 2px solid #007030;
+    background: #f4a460;
+    color: #3d1810;
+    border: 2px solid #8d5524;
     border-radius: 3px; /* Square */
 }
 
 .legend-marker.scale-note {
-    background: #BFBFBF;
-    color: #333;
+    background: #5c2f1f;
+    color: #ffe4b5;
     border-radius: 50%; /* Circle */
 }
 
 .legend-marker.leading-note {
-    background: #7FA925;
-    color: #000000;
+    background: #d4722e;
+    color: #0a0807;
     border: none;
     border-radius: 0;
     clip-path: polygon(20% 0%, 20% 100%, 100% 50%); /* Triangle */
@@ -217,9 +217,9 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .legend-marker.root-note {
-    background: #007030;
-    border: 2px solid #FEE11A;
-    color: #FEE11A;
+    background: #8d5524;
+    border: 2px solid #f4a460;
+    color: #ffe4b5;
     border-radius: 3px; /* Square for roots */
 }
 
@@ -243,10 +243,10 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .chord-section {
-    background: #0d0d0d;
+    background: #1a1410;
     border-radius: 12px;
     padding: 20px;
-    border: 1px solid #333;
+    border: 2px solid #3d2f27;
 }
 
 .chord-controls {
@@ -260,16 +260,17 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 .chord-label {
     font-size: 1.2em;
     font-weight: bold;
-    color: #ffffff;
+    color: #f4a460;
     padding: 8px 0;
     min-width: 80px;
 }
 
 .fretboard-container {
-    background: #290e08;
+    background: linear-gradient(135deg, #3d1810 0%, #2a1108 100%);
     padding: 20px;
     padding-bottom: 60px;
     border-radius: 12px;
+    border: 3px solid #5c2f1f;
     overflow-x: auto;
 }
 
@@ -286,7 +287,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: white;
+    color: #ffe4b5;
     font-size: 1.1em;
     padding: 10px;
 }
@@ -308,7 +309,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     top: 50%;
     transform: translateY(-50%);
     height: 2px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 228, 181, 0.3);
     z-index: 0;
 }
 
@@ -347,6 +348,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     font-weight: normal;
     vertical-align: sub;
     line-height: 0;
+    margin-left: 2px;
 }
 
 .fret-marker sup {
@@ -357,24 +359,24 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .fret-marker.chord-tone {
-    background: #FEE11A;
-    color: #007030;
-    border: 3px solid #007030;
+    background: #f4a460;
+    color: #3d1810;
+    border: 3px solid #8d5524;
     border-radius: 4px; /* Square for chord tones */
     font-size: 0.75em;
 }
 
 .fret-marker.scale-note {
-    background: #BFBFBF;
-    color: #333;
-    border-color: #999999;
+    background: #5c2f1f;
+    color: #ffe4b5;
+    border-color: #3d2f27;
     border-radius: 50%; /* Circle for scale notes */
     font-size: 0.7em;
 }
 
 .fret-marker.leading-note {
-    background: #7FA925;
-    color: #000000;
+    background: #d4722e;
+    color: #0a0807;
     border: none;
     border-radius: 0;
     clip-path: polygon(20% 0%, 20% 100%, 100% 50%); /* Triangle shifted right */
@@ -382,25 +384,25 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .fret-marker.leading-chord-tone {
-    background: #FEE11A;
-    color: #007030;
-    border: 2px solid #007030;
+    background: #f4a460;
+    color: #3d1810;
+    border: 2px solid #8d5524;
     border-radius: 0;
     clip-path: polygon(0% 20%, 0% 80%, 60% 80%, 60% 100%, 100% 50%, 60% 0%, 60% 20%); /* House shape pointing right */
     width: 36px;
 }
 
 .fret-marker.root {
-    background: #007030;
-    color: #FEE11A;
-    border: 3px solid #FEE11A;
+    background: #8d5524;
+    color: #ffe4b5;
+    border: 3px solid #f4a460;
     font-weight: 900;
 }
 
 .fret-marker.chord-tone.root {
-    background: #007030;
-    color: #FEE11A;
-    border: 3px solid #FEE11A;
+    background: #8d5524;
+    color: #ffe4b5;
+    border: 3px solid #f4a460;
     border-radius: 4px;
 }
 
@@ -408,7 +410,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     position: absolute;
     bottom: -30px;
     font-size: 0.8em;
-    color: white;
+    color: #c9a887;
     font-weight: bold;
 }
 
@@ -423,15 +425,15 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 
 /* Progression Mode */
 .progression-selector {
-    background: #1a1a1a;
+    background: #1a1410;
     border-radius: 12px;
     padding: 30px;
     margin-bottom: 30px;
-    border: 1px solid #333;
+    border: 2px solid #3d2f27;
 }
 
 .progression-selector h2 {
-    color: #ffffff;
+    color: #f4a460;
     margin-bottom: 20px;
     text-align: center;
 }
@@ -445,22 +447,22 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .key-selector label {
-    color: #ffffff;
+    color: #c9a887;
     font-weight: 600;
 }
 
 .key-selector select {
     padding: 8px 16px;
-    background: #0d0d0d;
-    color: #ffffff;
-    border: 2px solid #333;
+    background: #1a1410;
+    color: #c9a887;
+    border: 2px solid #5c2f1f;
     border-radius: 6px;
     font-size: 1em;
     cursor: pointer;
 }
 
 .key-selector select:hover {
-    border-color: #007030;
+    border-color: #8d5524;
 }
 
 .progression-toggles {
@@ -475,7 +477,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #ffffff;
+    color: #c9a887;
     font-weight: 600;
     cursor: pointer;
 }
@@ -484,7 +486,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #007030;
+    accent-color: #8d5524;
 }
 
 .progression-list {
@@ -495,9 +497,9 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 
 .progression-btn {
     padding: 15px 20px;
-    background: #0d0d0d;
-    color: #ffffff;
-    border: 2px solid #333;
+    background: #2a1f1a;
+    color: #c9a887;
+    border: 2px solid #5c2f1f;
     border-radius: 8px;
     font-size: 1em;
     cursor: pointer;
@@ -506,8 +508,9 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .progression-btn:hover {
-    background: #007030;
-    border-color: #007030;
+    background: #8d5524;
+    border-color: #d4722e;
+    color: #ffe4b5;
     transform: translateY(-2px);
 }
 
