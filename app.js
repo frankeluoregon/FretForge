@@ -424,13 +424,21 @@ const App = {
         section.appendChild(fretboardContainer);
 
         // Create playback button with flyout - positioned absolutely
+        
+        // Playback overlay anchored to the fretboard's top-right
         const playbackContainer = this.createPlaybackControls(index, 'prog');
+        
+        // Make the fretboard container the positioning context
+        fretboardContainer.style.position = 'relative';
+        
+        // Top-right overlay
         playbackContainer.style.position = 'absolute';
-        playbackContainer.style.right = '20px';
-        playbackContainer.style.top = '50%';
-        playbackContainer.style.transform = 'translateY(-50%)';
+        playbackContainer.style.top = '8px';
+        playbackContainer.style.right = '8px';
         playbackContainer.style.zIndex = '10';
-        section.appendChild(playbackContainer);
+        
+        // Append overlay inside the fretboard
+        fretboardContainer.appendChild(playbackContainer);
 
         return section;
     },
