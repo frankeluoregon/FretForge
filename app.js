@@ -239,6 +239,36 @@ const App = {
             this.loadProgression(progression, use7ths);
         });
 
+        // Progression playback controls in toolbar
+        const playProgressionBtn = document.getElementById('play-progression-btn');
+        const progressionFlyout = document.getElementById('progression-playback-flyout');
+
+        playProgressionBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = progressionFlyout.style.display === 'block';
+            // Close all flyouts
+            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
+            // Toggle this flyout
+            progressionFlyout.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Mode button handlers for progression playback
+        progressionFlyout.querySelectorAll('.playback-mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const playbackMode = btn.dataset.mode;
+                this.playProgression(playbackMode);
+                progressionFlyout.style.display = 'none';
+            });
+        });
+
+        // Stop button handler
+        document.getElementById('progression-stop-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            MIDIPlayer.stopAll();
+            progressionFlyout.style.display = 'none';
+        });
+
         // Export to PDF button - now shows orientation selector
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
             const orientationGroup = document.getElementById('pdf-orientation-group');
@@ -249,6 +279,13 @@ const App = {
                 document.getElementById('pdf-orientation').focus();
             } else {
                 orientationGroup.style.display = 'none';
+            }
+        });
+
+        // Close flyouts when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.playback-container')) {
+                document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
             }
         });
     },
@@ -386,6 +423,15 @@ const App = {
         fretboardContainer.className = 'fretboard-container';
         section.appendChild(fretboardContainer);
 
+        // Create playback button with flyout - positioned absolutely
+        const playbackContainer = this.createPlaybackControls(index, 'prog');
+        playbackContainer.style.position = 'absolute';
+        playbackContainer.style.right = '20px';
+        playbackContainer.style.top = '50%';
+        playbackContainer.style.transform = 'translateY(-50%)';
+        playbackContainer.style.zIndex = '10';
+        section.appendChild(playbackContainer);
+
         return section;
     },
 
@@ -464,6 +510,10 @@ const App = {
         );
         rootAccidentalGroup.classList.add('compact-group');
         controls.appendChild(rootAccidentalGroup);
+
+        // Create playback button with flyout
+        const playbackContainer = this.createPlaybackControls(index, 'fretboard');
+        controls.appendChild(playbackContainer);
 
         // Chord type selector
         const chordGroup = this.createSelect(
@@ -547,6 +597,108 @@ const App = {
 
             modeSelect.appendChild(optElement);
         });
+    },
+
+    /**
+     * Create playback controls (button + flyout)
+     */
+    createPlaybackControls(index, mode) {
+        const container = document.createElement('div');
+        container.className = 'playback-container';
+        container.style.position = 'relative';
+
+        // Create playback button
+        const playButton = document.createElement('button');
+        playButton.className = 'playback-button';
+        playButton.innerHTML = '▶ Play';
+        playButton.dataset.index = index;
+        playButton.dataset.mode = mode;
+
+        // Create flyout
+        const flyout = document.createElement('div');
+        flyout.className = 'playback-flyout';
+        flyout.dataset.index = index;
+
+        // Create mode buttons
+        const harmonyBtn = document.createElement('button');
+        harmonyBtn.className = 'playback-mode-btn';
+        harmonyBtn.textContent = '🎵 Harmony';
+        harmonyBtn.dataset.playbackMode = 'harmony';
+
+        const strumBtn = document.createElement('button');
+        strumBtn.className = 'playback-mode-btn';
+        strumBtn.textContent = '🎸 Strum';
+        strumBtn.dataset.playbackMode = 'strum';
+
+        const arpeggioBtn = document.createElement('button');
+        arpeggioBtn.className = 'playback-mode-btn';
+        arpeggioBtn.textContent = '🎼 Arpeggio';
+        arpeggioBtn.dataset.playbackMode = 'arpeggio';
+
+        const stopBtn = document.createElement('button');
+        stopBtn.className = 'stop-button';
+        stopBtn.textContent = '⏹ Stop';
+
+        flyout.appendChild(harmonyBtn);
+        flyout.appendChild(strumBtn);
+        flyout.appendChild(arpeggioBtn);
+        flyout.appendChild(stopBtn);
+
+        container.appendChild(playButton);
+        container.appendChild(flyout);
+
+        // Event listeners
+        playButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = flyout.style.display === 'block';
+            // Close all other flyouts
+            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
+            // Toggle this flyout
+            flyout.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Mode button handlers
+        [harmonyBtn, strumBtn, arpeggioBtn].forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const playbackMode = btn.dataset.playbackMode;
+                const chord = this.chords[index];
+                this.playChord(chord, playbackMode);
+                flyout.style.display = 'none';
+            });
+        });
+
+        // Stop button handler
+        stopBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            MIDIPlayer.stopAll();
+            flyout.style.display = 'none';
+        });
+
+        return container;
+    },
+
+    /**
+     * Play a chord using MIDI
+     */
+    async playChord(chord, playbackMode) {
+        const instrument = this.currentInstrument;
+
+        if (playbackMode === 'harmony') {
+            await MIDIPlayer.playChordHarmony(chord, instrument);
+        } else if (playbackMode === 'strum') {
+            await MIDIPlayer.playChordStrum(chord, instrument);
+        } else if (playbackMode === 'arpeggio') {
+            await MIDIPlayer.playChordArpeggio(chord, instrument);
+        }
+    },
+
+    /**
+     * Play entire progression
+     */
+    async playProgression(playbackMode) {
+        const instrument = this.currentInstrument;
+        await MIDIPlayer.playProgression(this.chords, instrument, playbackMode, 2.0);
     },
 
     /**

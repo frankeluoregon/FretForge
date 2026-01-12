@@ -119,12 +119,24 @@ body:has(.top-bar.mobile-static) {
     background: rgba(31, 24, 19, 0.3);
     border-top: 1px solid #3d2f27;
     justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .progression-select-row select {
     font-size: 1.2em;
     padding: 8px 16px;
     min-width: 300px;
+}
+
+.progression-select-row .playback-container {
+    flex-shrink: 0;
+}
+
+.progression-select-row .playback-button {
+    font-size: 1em;
+    padding: 8px 20px;
 }
 
 .bottom-left-controls {
@@ -371,6 +383,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     border-radius: 12px;
     padding: 20px;
     border: 2px solid #3d2f27;
+    position: relative;
 }
 
 .chord-controls {
@@ -823,6 +836,127 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 .progression-placeholder p {
     color: #c9a887;
     font-size: 1.1em;
+}
+
+/* MIDI Playback Controls */
+.playback-button {
+    background: #8d5524;
+    color: #ffe4b5;
+    border: 2px solid #f4a460;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.playback-button:hover {
+    background: #a66929;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(141, 85, 36, 0.4);
+}
+
+.playback-button:active {
+    transform: translateY(0);
+}
+
+.playback-button.playing {
+    background: #6b7c3a;
+    border-color: #8d9f55;
+}
+
+.playback-flyout {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: #1a1410;
+    border: 2px solid #5c2f1f;
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    display: none;
+}
+
+.playback-flyout.active {
+    display: block;
+}
+
+.playback-flyout h4 {
+    color: #f4a460;
+    font-size: 1em;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.playback-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.playback-mode-btn {
+    background: #2a1f1a;
+    color: #c9a887;
+    border: 2px solid #3d2f27;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.playback-mode-btn:hover {
+    background: #3d2f27;
+    border-color: #5c2f1f;
+    transform: translateX(2px);
+}
+
+.playback-mode-btn:active {
+    transform: translateX(0);
+}
+
+.playback-mode-btn .icon {
+    font-size: 1.2em;
+    min-width: 20px;
+    text-align: center;
+}
+
+.playback-mode-btn .label {
+    flex: 1;
+}
+
+.playback-mode-btn .description {
+    font-size: 0.8em;
+    color: #8d7a6a;
+    margin-top: 2px;
+}
+
+.playback-controls-wrapper {
+    position: relative;
+}
+
+.stop-button {
+    background: #5c2f1f;
+    color: #ffe4b5;
+    border: 2px solid #3d2f27;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.stop-button:hover {
+    background: #6b3a24;
+    border-color: #5c2f1f;
 }
 
 /* Mobile Responsive */
