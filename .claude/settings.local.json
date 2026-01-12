@@ -14,7 +14,9 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(gh repo rename:*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(git rm:*)",
+      "Bash(git reset:*)"
     ]
   }
 }
