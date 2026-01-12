@@ -1,4 +1,4 @@
-# ChordBoard
+# FretForge
 
 An interactive fretboard visualization tool for guitar and bass, featuring chord progressions with 7th chords and intelligent leading note detection.
 

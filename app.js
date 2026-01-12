@@ -99,6 +99,24 @@ const App = {
             this.pdfOrientation = e.target.value;
         });
 
+        // Zoom slider
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomValue = document.getElementById('zoom-value');
+        zoomSlider.addEventListener('input', (e) => {
+            const zoom = e.target.value;
+            zoomValue.textContent = `${zoom}%`;
+
+            // Apply zoom to both fretboard and progression containers
+            const fretboardContainer = document.getElementById('fretboard-container');
+            const progressionDisplay = document.getElementById('progression-display');
+
+            fretboardContainer.style.transform = `scale(${zoom / 100})`;
+            fretboardContainer.style.transformOrigin = 'top center';
+
+            progressionDisplay.style.transform = `scale(${zoom / 100})`;
+            progressionDisplay.style.transformOrigin = 'top center';
+        });
+
         // Chord select mode scale notes toggle
         document.getElementById('chord-select-show-scale').addEventListener('change', (e) => {
             this.showScaleNotes = e.target.checked;

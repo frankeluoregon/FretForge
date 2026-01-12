@@ -137,6 +137,51 @@ body:has(.top-bar.mobile-static) {
     accent-color: #8d5524;
 }
 
+#zoom-slider {
+    width: 80px;
+    height: 6px;
+    background: #5c2f1f;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    accent-color: #8d5524;
+}
+
+#zoom-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #8d5524;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#zoom-slider::-webkit-slider-thumb:hover {
+    background: #d4722e;
+}
+
+#zoom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #8d5524;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
+}
+
+#zoom-slider::-moz-range-thumb:hover {
+    background: #d4722e;
+}
+
+#zoom-value {
+    color: #c9a887;
+    font-size: 0.85em;
+    font-weight: 600;
+    min-width: 40px;
+}
+
 .export-btn {
     padding: 6px 16px;
     background: #8d5524;
@@ -240,6 +285,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     display: flex;
     flex-direction: column;
     gap: 30px;
+    transition: transform 0.2s ease;
 }
 
 .chord-section {
@@ -518,6 +564,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     display: flex;
     flex-direction: column;
     gap: 30px;
+    transition: transform 0.2s ease;
 }
 
 /* Mobile Responsive */

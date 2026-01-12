@@ -1,0 +1,27 @@
+{
+  "name": "fretforge",
+  "version": "1.0.0",
+  "description": "An interactive fretboard visualization tool for guitar and bass, featuring chord progressions with 7th chords and intelligent leading note detection",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -o"
+  },
+  "keywords": [
+    "guitar",
+    "bass",
+    "fretboard",
+    "chord",
+    "progression",
+    "music",
+    "theory",
+    "visualization",
+    "chord-chart"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rikfrankel/FretForge.git"
+  },
+  "homepage": "https://github.com/rikfrankel/FretForge#readme"
+}
