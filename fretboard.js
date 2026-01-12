@@ -36,6 +36,8 @@ const Fretboard = {
 
         const grid = document.createElement('div');
         grid.className = 'fretboard-grid';
+        // Dynamically set grid columns: label column + (numFrets + 1) for open string and frets
+        grid.style.gridTemplateColumns = `60px repeat(${this.numFrets + 1}, 1fr)`;
 
         // Create grid: strings (rows) x frets (columns)
         for (let stringIndex = 0; stringIndex < this.tuning.length; stringIndex++) {

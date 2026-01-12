@@ -323,7 +323,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 /* Fretboard Grid */
 .fretboard-grid {
     display: grid;
-    grid-template-columns: 60px repeat(13, 1fr);
+    grid-template-columns: 60px repeat(13, 1fr); /* Default for 12 frets, overridden by JS */
     gap: 0;
     min-width: 900px;
 }
