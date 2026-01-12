@@ -371,11 +371,8 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 /* Fretboard Container */
-#fretboard-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    transition: transform 0.2s ease;
+.fretboard-container {
+  position: relative;
 }
 
 .chord-section {
