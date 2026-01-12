@@ -391,6 +391,23 @@ const App = {
         fretboardContainer.className = 'fretboard-container';
         section.appendChild(fretboardContainer);
 
+        // Create playback button with flyout - positioned absolutely
+        
+        // Playback overlay anchored to the fretboard's top-right
+        const playbackContainer = this.createPlaybackControls(index, 'prog');
+        
+        // Make the fretboard container the positioning context
+        fretboardContainer.style.position = 'relative';
+        
+        // Top-right overlay
+        playbackContainer.style.position = 'absolute';
+        playbackContainer.style.top = '8px';
+        playbackContainer.style.right = '8px';
+        playbackContainer.style.zIndex = '10';
+        
+        // Append overlay inside the fretboard
+        fretboardContainer.appendChild(playbackContainer);
+
         return section;
     },
 
@@ -469,6 +486,18 @@ const App = {
         );
         rootAccidentalGroup.classList.add('compact-group');
         controls.appendChild(rootAccidentalGroup);
+
+        
+        // Make the fretboard container a positioning context
+        fretboardContainer.style.position = 'relative';
+        
+        // Playback overlay anchored to the fretboard's top-right
+        const playbackContainer = this.createPlaybackControls(index, 'fretboard');
+        playbackContainer.style.position = 'absolute';
+        playbackContainer.style.top = '8px';
+        playbackContainer.style.right = '8px';
+        playbackContainer.style.zIndex = '10';
+        fretboardContainer.appendChild(playbackContainer);
 
         // Chord type selector
         const chordGroup = this.createSelect(

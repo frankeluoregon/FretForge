@@ -92,6 +92,29 @@ body {
     white-space: nowrap;
 }
 
+
+
+/* Default fallback in case JS hasn't run yet */
+:root {
+  --topbar-offset: 140px; /* safe default; will be overwritten by JS */
+}
+
+/* Apply the offset to your page content wrappers */
+#fretboard-page,
+#progression-page,
+.page-content {
+  padding-top: var(--topbar-offset);
+  box-sizing: border-box;
+}
+
+/* Make sure nothing else zeroes it out */
+body:has(.top-bar.mobile-static) #fretboard-page,
+body:has(.top-bar.mobile-static) #progression-page,
+body:has(.top-bar.mobile-static) .page-content {
+  padding-top: var(--topbar-offset);
+}
+
+
 .mode-toggle {
     display: flex;
     gap: 5px;
@@ -394,11 +417,8 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 /* Fretboard Container */
-#fretboard-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    transition: transform 0.2s ease;
+.fretboard-container {
+  position: relative;
 }
 
 .chord-section {
