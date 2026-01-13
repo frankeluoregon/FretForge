@@ -1078,35 +1078,39 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     .fretboard-container {
         padding: 8px;
         padding-bottom: 30px;
-        overflow-x: hidden; /* No horizontal scroll */
+        overflow-x: auto; /* Allow horizontal scroll if needed */
+        overflow-y: visible;
         max-width: 100vw;
+        display: block !important; /* Ensure visible */
     }
 
     /* Fix fretboard width for mobile - scale to fit */
     .fretboard-grid {
-        min-width: auto !important;
-        width: 100%;
-        max-width: calc(100vw - 36px); /* Account for padding */
+        min-width: 300px !important; /* Minimum usable width */
+        width: fit-content;
+        max-width: calc(100vw - 32px); /* Account for padding */
+        display: grid !important; /* Ensure grid layout */
     }
 
     /* Scale down fret cells for portrait */
     body.portrait-mode .fret-cell {
-        height: 45px; /* Smaller for 5 frets */
+        height: 50px; /* Larger for visibility with 5 frets */
     }
 
     body.landscape-mode .fret-cell {
-        height: 35px; /* Even smaller for 12 frets */
+        height: 40px; /* Smaller for 12 frets */
     }
 
     /* Adjust string labels */
     .string-label {
-        font-size: 0.9em;
-        padding: 5px;
+        font-size: 0.95em;
+        padding: 8px 5px;
+        display: flex !important;
     }
 
     /* Chord controls - hide on mobile, use flyout instead */
     .chord-controls {
-        display: none;
+        display: none !important;
     }
 
     .chord-section {
@@ -1114,13 +1118,23 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
         margin-bottom: 12px;
         background: #1f1813;
         border-radius: 8px;
+        display: block !important; /* Ensure visible */
     }
 
     .chord-label {
         font-size: 0.95em;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         font-weight: bold;
         color: #f4a460;
+    }
+
+    .mobile-chord-label {
+        display: block !important; /* Always visible on mobile */
+    }
+
+    /* Hide chord label inside controls (desktop version) */
+    .chord-controls .chord-label {
+        display: none !important;
     }
 
     .progression-list {

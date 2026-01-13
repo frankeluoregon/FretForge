@@ -676,11 +676,18 @@ const App = {
         section.className = 'chord-section';
         section.dataset.index = index;
 
+        // Create chord label (visible on mobile)
+        const mainLabel = document.createElement('div');
+        mainLabel.className = 'chord-label mobile-chord-label';
+        const chord = this.chords[index];
+        mainLabel.textContent = `Chord ${index + 1}: ${chord.root} ${this.getChordTypeName(chord.type)}`;
+        section.appendChild(mainLabel);
+
         // Create controls
         const controls = document.createElement('div');
         controls.className = 'chord-controls';
 
-        // Chord number label
+        // Chord number label (for desktop)
         const label = document.createElement('div');
         label.className = 'chord-label';
         label.textContent = `Chord ${index + 1}`;
@@ -972,6 +979,15 @@ const App = {
     updateFretboard(index) {
         const chord = this.chords[index];
         const containerId = `fretboard-${index}`;
+
+        // Update the main label
+        const section = document.querySelector(`.chord-section[data-index="${index}"]`);
+        if (section) {
+            const mainLabel = section.querySelector('.mobile-chord-label');
+            if (mainLabel) {
+                mainLabel.textContent = `Chord ${index + 1}: ${chord.root} ${this.getChordTypeName(chord.type)}`;
+            }
+        }
 
         Fretboard.renderFretboard(
             containerId,
