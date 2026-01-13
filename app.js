@@ -311,26 +311,21 @@ const App = {
         });
 
         // Progression playback controls in toolbar
+        const progressionToggleGroup = document.getElementById('progression-mode-toggle');
         const playProgressionBtn = document.getElementById('play-progression-btn');
-        const progressionFlyout = document.getElementById('progression-playback-flyout');
 
-        playProgressionBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = progressionFlyout.style.display === 'block';
-            // Close all flyouts
-            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
-            // Toggle this flyout
-            progressionFlyout.style.display = isVisible ? 'none' : 'block';
+        // Toggle buttons logic
+        progressionToggleGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                progressionToggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
         });
 
-        // Mode button handlers for progression playback
-        progressionFlyout.querySelectorAll('.playback-mode-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const playbackMode = btn.dataset.mode;
-                this.playProgression(playbackMode);
-                progressionFlyout.style.display = 'none';
-            });
+        playProgressionBtn.addEventListener('click', (e) => {
+            const activeBtn = progressionToggleGroup.querySelector('.toggle-btn.active');
+            const mode = activeBtn ? activeBtn.dataset.mode : 'strum';
+            this.playProgression(mode);
         });
 
         // Export to PDF button - now shows orientation selector
@@ -343,13 +338,6 @@ const App = {
                 document.getElementById('pdf-orientation').focus();
             } else {
                 orientationGroup.style.display = 'none';
-            }
-        });
-
-        // Close flyouts when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.playback-container')) {
-                document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
             }
         });
     },
@@ -890,64 +878,51 @@ const App = {
      */
     createPlaybackControls(index, mode) {
         const container = document.createElement('div');
-        container.className = 'playback-container';
-        container.style.position = 'relative';
+        container.className = 'playback-container playback-controls-compact';
+        
+        // Default mode
+        let currentMode = 'strum';
 
-        // Create playback button
-        const playButton = document.createElement('button');
-        playButton.className = 'playback-button';
-        playButton.innerHTML = '▶ Play';
-        playButton.dataset.index = index;
-        playButton.dataset.mode = mode;
+        // Toggle Container
+        const toggleGroup = document.createElement('div');
+        toggleGroup.className = 'playback-toggle-group';
 
-        // Create flyout
-        const flyout = document.createElement('div');
-        flyout.className = 'playback-flyout';
-        flyout.dataset.index = index;
+        const modes = [
+            { id: 'harmony', icon: '🎵', title: 'Harmony' },
+            { id: 'strum', icon: '🎸', title: 'Strum' },
+            { id: 'arpeggio', icon: '🎼', title: 'Arpeggio' }
+        ];
 
-        // Create mode buttons
-        const harmonyBtn = document.createElement('button');
-        harmonyBtn.className = 'playback-mode-btn';
-        harmonyBtn.textContent = '🎵 Harmony';
-        harmonyBtn.dataset.playbackMode = 'harmony';
-
-        const strumBtn = document.createElement('button');
-        strumBtn.className = 'playback-mode-btn';
-        strumBtn.textContent = '🎸 Strum';
-        strumBtn.dataset.playbackMode = 'strum';
-
-        const arpeggioBtn = document.createElement('button');
-        arpeggioBtn.className = 'playback-mode-btn';
-        arpeggioBtn.textContent = '🎼 Arpeggio';
-        arpeggioBtn.dataset.playbackMode = 'arpeggio';
-
-        flyout.appendChild(harmonyBtn);
-        flyout.appendChild(strumBtn);
-        flyout.appendChild(arpeggioBtn);
-
-        container.appendChild(playButton);
-        container.appendChild(flyout);
-
-        // Event listeners
-        playButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = flyout.style.display === 'block';
-            // Close all other flyouts
-            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
-            // Toggle this flyout
-            flyout.style.display = isVisible ? 'none' : 'block';
-        });
-
-        // Mode button handlers
-        [harmonyBtn, strumBtn, arpeggioBtn].forEach(btn => {
+        modes.forEach(m => {
+            const btn = document.createElement('button');
+            btn.className = `toggle-btn ${m.id === currentMode ? 'active' : ''}`;
+            btn.innerHTML = m.icon;
+            btn.title = m.title;
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const playbackMode = btn.dataset.playbackMode;
-                const chord = this.chords[index];
-                this.playChord(chord, playbackMode);
-                flyout.style.display = 'none';
+                // Update UI
+                toggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = m.id;
             });
+            toggleGroup.appendChild(btn);
         });
+
+        // Play Button
+        const playBtn = document.createElement('button');
+        playBtn.className = 'compact-play-btn';
+        playBtn.innerHTML = '▶';
+        playBtn.title = 'Play';
+        playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this.chords[index]) {
+                const chord = this.chords[index];
+                this.playChord(chord, currentMode);
+            }
+        });
+
+        container.appendChild(toggleGroup);
+        container.appendChild(playBtn);
 
         return container;
     },
