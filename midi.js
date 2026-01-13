@@ -390,7 +390,7 @@ const MIDIPlayer = {
             const strumDelay = 0.05; // 50ms between notes
 
             if (instrument === 'mandolin') {
-                const courseDelay = strumDelay / 2;
+                const courseDelay = 0.01; // Very tight delay for mandolin courses
                 midiNotes.forEach((midiNote, index) => {
                     const toneNote = this.midiToToneNote(midiNote);
                     const startTime = index * strumDelay;
@@ -445,7 +445,7 @@ const MIDIPlayer = {
             const noteDuration = noteDelay * 1.2; // Slight overlap
 
             if (instrument === 'mandolin') {
-                const courseDelay = noteDelay / 2;
+                const courseDelay = 0.01; // Very tight delay for mandolin courses
                 midiNotes.forEach((midiNote, index) => {
                     const toneNote = this.midiToToneNote(midiNote);
                     const startTime = index * noteDelay;
