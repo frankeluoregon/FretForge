@@ -72,15 +72,24 @@ const App = {
             const numFretsSelect = document.getElementById('num-frets');
 
             if (isPortrait) {
-                // Portrait mode: limit to 5 frets for better visibility
+                // Portrait mode: lock to 5 frets, disable selector
                 Fretboard.numFrets = 5;
                 numFretsSelect.value = '5';
+                numFretsSelect.disabled = true;
+                numFretsSelect.style.opacity = '0.6';
+                numFretsSelect.style.cursor = 'not-allowed';
                 document.body.classList.add('portrait-mode');
                 document.body.classList.remove('landscape-mode');
             } else {
-                // Landscape mode: use 12 frets
-                Fretboard.numFrets = 12;
-                numFretsSelect.value = '12';
+                // Landscape mode: default to 5 frets, allow up to 12
+                // Only reset if currently at portrait-locked value
+                if (Fretboard.numFrets === 5 && numFretsSelect.value === '5') {
+                    Fretboard.numFrets = 5;
+                    numFretsSelect.value = '5';
+                }
+                numFretsSelect.disabled = false;
+                numFretsSelect.style.opacity = '1';
+                numFretsSelect.style.cursor = 'pointer';
                 document.body.classList.add('landscape-mode');
                 document.body.classList.remove('portrait-mode');
             }

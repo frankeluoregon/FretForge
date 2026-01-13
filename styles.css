@@ -1170,6 +1170,14 @@ body.mobile-device.portrait-mode .fret-marker {
     height: 55px;
 }
 
+/* Disabled fret selector in portrait mode */
+body.mobile-device.portrait-mode #num-frets {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #1a1410;
+    pointer-events: none;
+}
+
 /* Landscape mode specific adjustments */
 body.mobile-device.landscape-mode .top-bar-content {
     padding: 8px 15px; /* Compact toolbar in landscape */
