@@ -1006,40 +1006,38 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     }
 
     .page-content {
-        padding: 0 15px 30px 15px;
-        margin-top: 10px;
+        padding: 0 10px 20px 10px;
+        margin-top: 5px;
     }
 
     #fretboard-container, #progression-display {
-        margin-top: 10px;
+        margin-top: 5px;
     }
 
-    /* More compact toolbar on mobile */
+    /* Minimal toolbar on mobile - only essentials visible */
     .top-bar-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 10px 12px;
-        max-height: 50vh;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
     }
 
     .top-bar h1 {
-        font-size: 1.3em;
-        text-align: center;
-        margin-bottom: 5px;
+        font-size: 1.2em;
+        margin: 0;
+        flex: 1;
     }
 
     .mode-toggle {
-        justify-content: center;
+        flex-shrink: 0;
     }
 
     /* Larger tap targets for mobile */
     .mode-btn {
-        min-height: 44px;
-        padding: 10px 20px;
-        font-size: 0.95em;
+        min-height: 40px;
+        padding: 8px 16px;
+        font-size: 0.85em;
     }
 
     /* Better button sizes */
@@ -1059,138 +1057,179 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     /* Better input spacing - more compact */
     .input-group {
         justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        width: 100%;
     }
 
     .input-group label {
-        font-size: 0.85em;
+        font-size: 0.9em;
         flex-shrink: 0;
         margin-right: 8px;
     }
 
-    /* Hide legend on mobile to save space */
-    .legend {
-        display: none;
-    }
-
+    /* Hide all extra controls in main toolbar */
+    .legend,
+    .top-row-controls,
     .top-bar-row.bottom-row {
-        flex-direction: column;
-        gap: 8px;
+        display: none !important;
     }
 
-    .bottom-left-controls {
-        flex-direction: column;
-        width: 100%;
-        gap: 8px;
-    }
-
-    .top-controls {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .top-row-controls {
-        flex-direction: column;
-        width: 100%;
-        gap: 8px;
-    }
-
-    /* Hide zoom and export on mobile initially */
-    .top-row-controls {
-        display: none;
-    }
-
+    /* Fretboard sizing - fit to viewport */
     .fretboard-container {
-        padding: 10px;
-        padding-bottom: 40px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 8px;
+        padding-bottom: 30px;
+        overflow-x: hidden; /* No horizontal scroll */
+        max-width: 100vw;
     }
 
-    /* Fix fretboard width for mobile */
+    /* Fix fretboard width for mobile - scale to fit */
     .fretboard-grid {
         min-width: auto !important;
         width: 100%;
+        max-width: calc(100vw - 36px); /* Account for padding */
     }
 
+    /* Scale down fret cells for portrait */
+    body.portrait-mode .fret-cell {
+        height: 45px; /* Smaller for 5 frets */
+    }
+
+    body.landscape-mode .fret-cell {
+        height: 35px; /* Even smaller for 12 frets */
+    }
+
+    /* Adjust string labels */
+    .string-label {
+        font-size: 0.9em;
+        padding: 5px;
+    }
+
+    /* Chord controls - hide on mobile, use flyout instead */
     .chord-controls {
-        flex-direction: column;
-        gap: 10px;
+        display: none;
     }
 
     .chord-section {
-        padding: 12px;
-        margin-bottom: 15px;
+        padding: 8px;
+        margin-bottom: 12px;
+        background: #1f1813;
+        border-radius: 8px;
     }
 
     .chord-label {
-        font-size: 1em;
-        margin-bottom: 8px;
+        font-size: 0.95em;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #f4a460;
     }
 
     .progression-list {
         grid-template-columns: 1fr;
     }
 
-    /* Larger fret markers on mobile */
+    /* Responsive fret markers */
     .fret-marker {
-        width: 50px;
-        height: 50px;
-        font-size: 1em;
+        width: 40px;
+        height: 40px;
+        font-size: 0.85em;
+    }
+
+    body.portrait-mode .fret-marker {
+        width: 45px;
+        height: 45px;
+        font-size: 0.9em;
+    }
+
+    body.landscape-mode .fret-marker {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75em;
     }
 
     .fret-marker .note-name {
-        font-size: 1.1em;
+        font-size: 1em;
     }
 
     .fret-marker .interval {
-        font-size: 0.8em;
+        font-size: 0.7em;
     }
 
     /* Better playback controls on mobile */
     .playback-container {
-        margin-top: 10px;
+        margin-top: 8px;
+        position: static !important;
     }
 
     .playback-flyout {
-        min-width: 240px;
-        padding: 12px;
+        min-width: 200px;
+        padding: 10px;
+        left: 8px;
+        right: auto;
     }
 
     .playback-mode-btn {
-        min-height: 48px;
-        padding: 12px 16px;
-        font-size: 16px;
-    }
-
-    /* Better progression selector on mobile */
-    .progression-select-row select {
-        font-size: 16px;
+        min-height: 44px;
         padding: 10px 14px;
-        min-width: auto;
-        width: 100%;
+        font-size: 16px;
     }
 
+    /* Hide progression selector row on mobile */
     .progression-select-row {
-        padding: 10px 12px;
-        flex-direction: column;
-        gap: 10px;
+        display: none !important;
     }
 
-    /* Zoom slider touch target */
-    #zoom-slider {
-        width: 120px;
-        height: 8px;
+    /* Mobile settings button and flyout */
+    .mobile-settings-btn {
+        min-height: 40px;
+        padding: 8px 12px;
+        background: #8d5524;
+        color: #ffe4b5;
+        border: 2px solid #5c2f1f;
+        border-radius: 6px;
+        font-size: 1.2em;
+        cursor: pointer;
+        flex-shrink: 0;
     }
 
-    #zoom-slider::-webkit-slider-thumb {
-        width: 20px;
-        height: 20px;
+    .mobile-settings-flyout {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #1a1410;
+        border-bottom: 2px solid #5c2f1f;
+        padding: 12px;
+        max-height: 60vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 999;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
 
-    #zoom-slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+    .mobile-settings-flyout.active {
+        display: block;
+    }
+
+    .mobile-settings-flyout .input-group {
+        margin-bottom: 12px;
+    }
+
+    .mobile-settings-section {
+        border-bottom: 1px solid #3d2f27;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .mobile-settings-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .mobile-settings-section h3 {
+        color: #f4a460;
+        font-size: 0.95em;
+        margin-bottom: 8px;
     }
 }
 

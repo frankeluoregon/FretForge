@@ -23,6 +23,7 @@ const App = {
             document.body.classList.add('mobile-device');
             this.setupMobileScrollBehavior();
             this.setupOrientationDetection();
+            this.setupMobileSettingsButton();
         }
 
         // Initialize chord progression with defaults
@@ -70,6 +71,7 @@ const App = {
         const handleOrientationChange = () => {
             const isPortrait = window.innerHeight > window.innerWidth;
             const numFretsSelect = document.getElementById('num-frets');
+            const mobileNumFretsSelect = document.getElementById('mobile-num-frets');
 
             if (!numFretsSelect) {
                 console.warn('num-frets select not found, skipping orientation change');
@@ -83,6 +85,14 @@ const App = {
                 numFretsSelect.disabled = true;
                 numFretsSelect.style.opacity = '0.6';
                 numFretsSelect.style.cursor = 'not-allowed';
+
+                if (mobileNumFretsSelect) {
+                    mobileNumFretsSelect.value = '5';
+                    mobileNumFretsSelect.disabled = true;
+                    mobileNumFretsSelect.style.opacity = '0.6';
+                    mobileNumFretsSelect.style.cursor = 'not-allowed';
+                }
+
                 document.body.classList.add('portrait-mode');
                 document.body.classList.remove('landscape-mode');
             } else {
@@ -91,10 +101,18 @@ const App = {
                 if (Fretboard.numFrets === 5 && numFretsSelect.value === '5') {
                     Fretboard.numFrets = 5;
                     numFretsSelect.value = '5';
+                    if (mobileNumFretsSelect) mobileNumFretsSelect.value = '5';
                 }
                 numFretsSelect.disabled = false;
                 numFretsSelect.style.opacity = '1';
                 numFretsSelect.style.cursor = 'pointer';
+
+                if (mobileNumFretsSelect) {
+                    mobileNumFretsSelect.disabled = false;
+                    mobileNumFretsSelect.style.opacity = '1';
+                    mobileNumFretsSelect.style.cursor = 'pointer';
+                }
+
                 document.body.classList.add('landscape-mode');
                 document.body.classList.remove('portrait-mode');
             }
@@ -112,11 +130,146 @@ const App = {
         // Initial orientation setup - delayed to ensure DOM is ready
         setTimeout(() => {
             handleOrientationChange();
-        }, 100);
+        }, 200);
 
         // Listen for orientation changes
         window.addEventListener('orientationchange', handleOrientationChange);
         window.addEventListener('resize', handleOrientationChange);
+    },
+
+    /**
+     * Setup mobile settings button and flyout
+     */
+    setupMobileSettingsButton() {
+        // Create settings button
+        const settingsBtn = document.createElement('button');
+        settingsBtn.className = 'mobile-settings-btn';
+        settingsBtn.innerHTML = '⚙';
+        settingsBtn.setAttribute('aria-label', 'Settings');
+
+        // Create flyout container
+        const flyout = document.createElement('div');
+        flyout.className = 'mobile-settings-flyout';
+        flyout.id = 'mobile-settings-flyout';
+
+        // Move controls to flyout
+        const bottomRow = document.querySelector('.top-bar-row.bottom-row');
+        if (bottomRow) {
+            const bottomLeftControls = bottomRow.querySelector('.bottom-left-controls');
+            if (bottomLeftControls) {
+                // Clone the controls
+                const controlsClone = bottomLeftControls.cloneNode(true);
+                controlsClone.style.display = 'flex';
+                flyout.appendChild(controlsClone);
+            }
+        }
+
+        // Add button and flyout to toolbar
+        const topBarContent = document.querySelector('.top-bar-content');
+        topBarContent.appendChild(settingsBtn);
+        document.body.appendChild(flyout);
+
+        // Toggle flyout on button click
+        settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            flyout.classList.toggle('active');
+        });
+
+        // Close flyout when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.mobile-settings-flyout') &&
+                !e.target.closest('.mobile-settings-btn')) {
+                flyout.classList.remove('active');
+            }
+        });
+
+        // Re-attach event listeners to cloned controls
+        this.attachMobileControlListeners(flyout);
+    },
+
+    /**
+     * Attach event listeners to mobile flyout controls
+     */
+    attachMobileControlListeners(flyout) {
+        // Instrument selector
+        const instrumentSelect = flyout.querySelector('#instrument');
+        if (instrumentSelect) {
+            instrumentSelect.id = 'mobile-instrument';
+            instrumentSelect.addEventListener('change', (e) => {
+                this.currentInstrument = e.target.value;
+                Fretboard.setInstrument(this.currentInstrument);
+                document.getElementById('instrument').value = e.target.value;
+
+                const guitarTuningGroup = flyout.querySelector('#guitar-tuning-group, [id^="mobile-guitar-tuning"]').closest('.input-group');
+                if (this.currentInstrument === 'guitar') {
+                    if (guitarTuningGroup) guitarTuningGroup.style.display = 'flex';
+                } else {
+                    if (guitarTuningGroup) guitarTuningGroup.style.display = 'none';
+                }
+
+                if (this.currentMode === 'fretboard') {
+                    this.renderFretboards();
+                } else {
+                    this.renderProgressionDisplay();
+                }
+            });
+        }
+
+        // Guitar tuning selector
+        const guitarTuningSelect = flyout.querySelector('#guitar-tuning');
+        if (guitarTuningSelect) {
+            guitarTuningSelect.id = 'mobile-guitar-tuning';
+            guitarTuningSelect.addEventListener('change', (e) => {
+                Fretboard.setGuitarTuning(e.target.value);
+                const desktopSelect = document.getElementById('guitar-tuning');
+                if (desktopSelect) desktopSelect.value = e.target.value;
+                if (this.currentMode === 'fretboard') {
+                    this.renderFretboards();
+                } else {
+                    this.renderProgressionDisplay();
+                }
+            });
+        }
+
+        // Number of chords
+        const numChordsSelect = flyout.querySelector('#num-chords');
+        if (numChordsSelect) {
+            numChordsSelect.id = 'mobile-num-chords';
+            numChordsSelect.addEventListener('change', (e) => {
+                this.numChords = parseInt(e.target.value);
+                document.getElementById('num-chords').value = e.target.value;
+                this.initializeChords();
+                this.renderFretboards();
+            });
+        }
+
+        // Number of frets
+        const numFretsSelect = flyout.querySelector('#num-frets');
+        if (numFretsSelect) {
+            numFretsSelect.id = 'mobile-num-frets';
+            numFretsSelect.addEventListener('change', (e) => {
+                Fretboard.numFrets = parseInt(e.target.value);
+                document.getElementById('num-frets').value = e.target.value;
+                if (this.currentMode === 'fretboard') {
+                    this.renderFretboards();
+                } else {
+                    this.renderProgressionDisplay();
+                }
+            });
+        }
+
+        // Show scale notes checkbox
+        const showScaleCheckbox = flyout.querySelector('#chord-select-show-scale');
+        if (showScaleCheckbox) {
+            showScaleCheckbox.id = 'mobile-chord-select-show-scale';
+            showScaleCheckbox.addEventListener('change', (e) => {
+                this.showScaleNotes = e.target.checked;
+                document.getElementById('chord-select-show-scale').checked = e.target.checked;
+                if (this.currentMode === 'fretboard') {
+                    this.renderFretboards();
+                }
+            });
+        }
     },
 
     /**
