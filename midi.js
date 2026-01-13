@@ -269,11 +269,10 @@ const MIDIPlayer = {
                 // Ensure string exists on current instrument
                 if (stringIndex < tuning.length) {
                     // Calculate note locally to avoid dependency on Fretboard UI state
-                    const openNote = tuning[stringIndex];
-                    const note = MusicTheory.transposeNote(openNote, fret);
+                    const openNoteName = tuning[stringIndex];
                     const baseOctave = baseOctaves[stringIndex];
-                    const octave = baseOctave + Math.floor(fret / 12);
-                    const midiNote = this.noteToMidi(note + octave);
+                    const openMidi = this.noteToMidi(openNoteName + baseOctave);
+                    const midiNote = openMidi + fret;
                     notes.push(midiNote);
                 }
             });
@@ -293,10 +292,14 @@ const MIDIPlayer = {
         });
 
         // Find the lowest Root note >= minMidi
+        // Target the 2nd octave range (start of 2nd octave relative to instrument low note)
+        const targetMinMidi = minMidi + 12;
+
+        // Find the lowest Root note >= targetMinMidi
         let rootMidi = -1;
-        for (let oct = 1; oct <= 8; oct++) {
+        for (let oct = 0; oct <= 8; oct++) {
             const testMidi = this.noteToMidi(chord.root + oct);
-            if (testMidi >= minMidi) {
+            if (testMidi >= targetMinMidi) {
                 rootMidi = testMidi;
                 break;
             }
@@ -320,10 +323,10 @@ const MIDIPlayer = {
             guitar: [4, 3, 3, 3, 2, 2], // E4, B3, G3, D3, A2, E2
             bass4: [2, 2, 1, 1],         // G2, D2, A1, E1
             bass5: [2, 2, 1, 1, 0],      // G2, D2, A1, E1, B0
-            bass6: [2, 2, 2, 1, 1, 0],   // C2, G2, D2, A1, E1, B0
-            ukulele: [4, 4, 4, 3],       // A4, E4, C4, G3 (reentrant)
+            bass6: [3, 2, 2, 1, 1, 0],   // C3, G2, D2, A1, E1, B0
+            ukulele: [4, 4, 4, 4],       // A4, E4, C4, G4 (High G)
             mandolin: [4, 4, 3, 3, 3, 3, 2, 2], // E4, E4, A3, A3, D3, D3, G2, G2
-            banjo: [4, 3, 3, 2, 2]       // D4, B3, G3, D2, G2
+            banjo: [4, 3, 3, 3, 4]       // D4, B3, G3, D3, G4 (High G 5th string)
         };
 
         return octaveMap[instrument] || octaveMap.guitar;
