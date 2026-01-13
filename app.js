@@ -45,35 +45,21 @@ const App = {
     },
 
     /**
-     * Setup mobile scroll behavior to hide/show toolbar
+     * Setup mobile scroll behavior - keep toolbar visible
+     * Only add subtle shadow when scrolling for visual feedback
      */
     setupMobileScrollBehavior() {
-        let lastScrollTop = 0;
-        let scrollTimeout;
         const topBar = document.querySelector('.top-bar');
-        const scrollThreshold = 10; // Minimum scroll distance to trigger hide/show
 
         window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-            scrollTimeout = setTimeout(() => {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const scrollDiff = Math.abs(scrollTop - lastScrollTop);
-
-                // Only trigger if scroll difference is significant
-                if (scrollDiff > scrollThreshold) {
-                    if (scrollTop > lastScrollTop && scrollTop > 100) {
-                        // Scrolling down - hide toolbar
-                        topBar.style.transform = 'translateY(-100%)';
-                        topBar.style.transition = 'transform 0.3s ease-in-out';
-                    } else {
-                        // Scrolling up - show toolbar
-                        topBar.style.transform = 'translateY(0)';
-                        topBar.style.transition = 'transform 0.3s ease-in-out';
-                    }
-                    lastScrollTop = scrollTop;
-                }
-            }, 10);
+            // Add shadow when scrolled, remove when at top
+            if (scrollTop > 10) {
+                topBar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.8)';
+            } else {
+                topBar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
+            }
         }, { passive: true });
     },
 

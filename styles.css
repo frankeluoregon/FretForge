@@ -1074,6 +1074,14 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     .fretboard-container {
         padding: 10px;
         padding-bottom: 50px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    /* Fix fretboard width for mobile */
+    .fretboard-grid {
+        min-width: auto !important; /* Override desktop min-width */
+        width: 100%;
     }
 
     .chord-controls {
@@ -1155,10 +1163,6 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 /* Portrait mode specific adjustments */
 body.mobile-device.portrait-mode {
     /* Additional portrait-specific styles */
-}
-
-body.mobile-device.portrait-mode .fretboard-grid {
-    min-width: auto; /* Allow fretboard to fit in portrait */
 }
 
 body.mobile-device.portrait-mode .fret-marker {
