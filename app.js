@@ -685,7 +685,7 @@ const App = {
         if (!isFiltering) {
             const filterBtn = document.createElement('button');
             filterBtn.className = 'filter-btn';
-            filterBtn.innerHTML = '<span>👁️</span> Filter';
+            filterBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4c2.01 2.59 7 9 7 9v7h4v-7s4.98-6.41 7-9H3z"/></svg> Filter';
             filterBtn.title = "Select specific notes to keep";
             filterBtn.onclick = () => this.toggleFilterMode(index);
             container.appendChild(filterBtn);
@@ -878,15 +878,15 @@ const App = {
         toggleGroup.className = 'playback-toggle-group';
 
         const modes = [
-            { id: 'harmony', icon: '🎵', title: 'Harmony' },
-            { id: 'strum', icon: '🎸', title: 'Strum' },
-            { id: 'arpeggio', icon: '🎼', title: 'Arpeggio' }
+            { id: 'harmony', label: 'unis', title: 'Harmony' },
+            { id: 'strum', label: 'strum', title: 'Strum' },
+            { id: 'arpeggio', label: 'arp', title: 'Arpeggio' }
         ];
 
         modes.forEach(m => {
             const btn = document.createElement('button');
             btn.className = `toggle-btn ${m.id === currentMode ? 'active' : ''}`;
-            btn.innerHTML = m.icon;
+            btn.innerHTML = m.label;
             btn.title = m.title;
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
