@@ -333,13 +333,6 @@ const App = {
             });
         });
 
-        // Stop button handler
-        document.getElementById('progression-stop-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            MIDIPlayer.stopAll();
-            progressionFlyout.style.display = 'none';
-        });
-
         // Export to PDF button - now shows orientation selector
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
             const orientationGroup = document.getElementById('pdf-orientation-group');
