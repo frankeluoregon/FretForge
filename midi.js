@@ -389,11 +389,24 @@ const MIDIPlayer = {
 
             const strumDelay = 0.05; // 50ms between notes
 
-            midiNotes.forEach((midiNote, index) => {
-                const toneNote = this.midiToToneNote(midiNote);
-                const startTime = '+' + (index * strumDelay);
-                sampler.triggerAttackRelease(toneNote, duration, startTime);
-            });
+            if (instrument === 'mandolin') {
+                const courseDelay = strumDelay / 2;
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = index * strumDelay;
+                    
+                    // First string of course
+                    sampler.triggerAttackRelease(toneNote, duration, '+' + startTime);
+                    // Second string of course
+                    sampler.triggerAttackRelease(toneNote, duration, '+' + (startTime + courseDelay));
+                });
+            } else {
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = '+' + (index * strumDelay);
+                    sampler.triggerAttackRelease(toneNote, duration, startTime);
+                });
+            }
             console.log('Triggered strum');
         } catch (error) {
             console.error('Error playing strum:', error);
@@ -431,11 +444,24 @@ const MIDIPlayer = {
             const noteDelay = duration / midiNotes.length;
             const noteDuration = noteDelay * 1.2; // Slight overlap
 
-            midiNotes.forEach((midiNote, index) => {
-                const toneNote = this.midiToToneNote(midiNote);
-                const startTime = '+' + (index * noteDelay);
-                sampler.triggerAttackRelease(toneNote, noteDuration, startTime);
-            });
+            if (instrument === 'mandolin') {
+                const courseDelay = noteDelay / 2;
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = index * noteDelay;
+                    
+                    // First string of course
+                    sampler.triggerAttackRelease(toneNote, noteDuration, '+' + startTime);
+                    // Second string of course
+                    sampler.triggerAttackRelease(toneNote, noteDuration, '+' + (startTime + courseDelay));
+                });
+            } else {
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = '+' + (index * noteDelay);
+                    sampler.triggerAttackRelease(toneNote, noteDuration, startTime);
+                });
+            }
             console.log('Triggered arpeggio');
         } catch (error) {
             console.error('Error playing arpeggio:', error);

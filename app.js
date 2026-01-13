@@ -492,10 +492,14 @@ const App = {
                     fretboardContainer.appendChild(playbackContainer);
                     
                     // Add filter controls
+                    // Add filter controls to header
+                    const section = fretboardContainer.closest('.chord-section');
+                    const header = section.querySelector('.chord-header');
                     const filterControls = this.createFilterControls(i);
                     // Position it top-right
                     filterControls.style.cssText = "position: absolute; top: 8px; right: 8px; z-index: 100;";
                     fretboardContainer.appendChild(filterControls);
+                    if (header) header.appendChild(filterControls);
                 }
             }
         }, 10);
@@ -507,6 +511,15 @@ const App = {
     createProgressionChordSection(index) {
         const section = document.createElement('div');
         section.className = 'chord-section';
+        section.dataset.index = index;
+
+        // Create header for label and controls
+        const header = document.createElement('div');
+        header.className = 'chord-header';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '10px';
 
         // Create label showing chord numeral and name
         const label = document.createElement('div');
@@ -514,6 +527,8 @@ const App = {
         const chord = this.chords[index];
         label.textContent = `${chord.numeral || index + 1} - ${chord.root} ${this.getChordTypeName(chord.type)} (${this.getModeName(chord.mode)})`;
         section.appendChild(label);
+        header.appendChild(label);
+        section.appendChild(header);
 
         // Create fretboard container
         const fretboardContainer = document.createElement('div');
