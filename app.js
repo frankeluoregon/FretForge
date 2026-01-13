@@ -20,7 +20,9 @@ const App = {
         // Detect mobile and adjust toolbar positioning
         if (this.isMobile()) {
             document.querySelector('.top-bar').classList.add('mobile-static');
+            document.body.classList.add('mobile-device');
             this.setupMobileScrollBehavior();
+            this.setupOrientationDetection();
         }
 
         // Initialize chord progression with defaults
@@ -43,36 +45,69 @@ const App = {
     },
 
     /**
-     * Setup mobile scroll behavior to hide/show toolbar
+     * Setup mobile scroll behavior - keep toolbar visible
+     * Only add subtle shadow when scrolling for visual feedback
      */
     setupMobileScrollBehavior() {
-        let lastScrollTop = 0;
-        let scrollTimeout;
         const topBar = document.querySelector('.top-bar');
-        const scrollThreshold = 10; // Minimum scroll distance to trigger hide/show
 
         window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-            scrollTimeout = setTimeout(() => {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const scrollDiff = Math.abs(scrollTop - lastScrollTop);
-
-                // Only trigger if scroll difference is significant
-                if (scrollDiff > scrollThreshold) {
-                    if (scrollTop > lastScrollTop && scrollTop > 100) {
-                        // Scrolling down - hide toolbar
-                        topBar.style.transform = 'translateY(-100%)';
-                        topBar.style.transition = 'transform 0.3s ease-in-out';
-                    } else {
-                        // Scrolling up - show toolbar
-                        topBar.style.transform = 'translateY(0)';
-                        topBar.style.transition = 'transform 0.3s ease-in-out';
-                    }
-                    lastScrollTop = scrollTop;
-                }
-            }, 10);
+            // Add shadow when scrolled, remove when at top
+            if (scrollTop > 10) {
+                topBar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.8)';
+            } else {
+                topBar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
+            }
         }, { passive: true });
+    },
+
+    /**
+     * Setup orientation detection for mobile devices
+     */
+    setupOrientationDetection() {
+        const handleOrientationChange = () => {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            const numFretsSelect = document.getElementById('num-frets');
+
+            if (isPortrait) {
+                // Portrait mode: lock to 5 frets, disable selector
+                Fretboard.numFrets = 5;
+                numFretsSelect.value = '5';
+                numFretsSelect.disabled = true;
+                numFretsSelect.style.opacity = '0.6';
+                numFretsSelect.style.cursor = 'not-allowed';
+                document.body.classList.add('portrait-mode');
+                document.body.classList.remove('landscape-mode');
+            } else {
+                // Landscape mode: default to 5 frets, allow up to 12
+                // Only reset if currently at portrait-locked value
+                if (Fretboard.numFrets === 5 && numFretsSelect.value === '5') {
+                    Fretboard.numFrets = 5;
+                    numFretsSelect.value = '5';
+                }
+                numFretsSelect.disabled = false;
+                numFretsSelect.style.opacity = '1';
+                numFretsSelect.style.cursor = 'pointer';
+                document.body.classList.add('landscape-mode');
+                document.body.classList.remove('portrait-mode');
+            }
+
+            // Re-render fretboards with new fret count
+            if (this.currentMode === 'fretboard') {
+                this.renderFretboards();
+            } else {
+                this.renderProgressionDisplay();
+            }
+        };
+
+        // Initial orientation setup
+        handleOrientationChange();
+
+        // Listen for orientation changes
+        window.addEventListener('orientationchange', handleOrientationChange);
+        window.addEventListener('resize', handleOrientationChange);
     },
 
     /**
