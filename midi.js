@@ -248,10 +248,37 @@ const MIDIPlayer = {
      */
     getChordMidiNotes(chord, instrument) {
         const notes = [];
-        const tuning = Fretboard.tunings[instrument] || Fretboard.tuning;
+        // Use Fretboard.tuning if instruments match to support alternate tunings
+        const tuning = (instrument === Fretboard.currentInstrument) ? Fretboard.tuning : (Fretboard.tunings[instrument] || Fretboard.tuning);
 
         // Get base octaves for each string based on instrument
         const baseOctaves = this.getBaseOctaves(instrument);
+
+        // If filter is active (visiblePositions exists), play only selected notes
+        if (chord.visiblePositions) {
+            if (chord.visiblePositions.size === 0) {
+                console.warn('Filter active but no notes selected - playing silence');
+                return [];
+            }
+
+            chord.visiblePositions.forEach(pos => {
+                const parts = pos.split('-');
+                const stringIndex = parseInt(parts[0]);
+                const fret = parseInt(parts[1]);
+                
+                // Ensure string exists on current instrument
+                if (stringIndex < tuning.length) {
+                    // Calculate note locally to avoid dependency on Fretboard UI state
+                    const openNote = tuning[stringIndex];
+                    const note = MusicTheory.transposeNote(openNote, fret);
+                    const baseOctave = baseOctaves[stringIndex];
+                    const octave = baseOctave + Math.floor(fret / 12);
+                    const midiNote = this.noteToMidi(note + octave);
+                    notes.push(midiNote);
+                }
+            });
+            return notes;
+        }
 
         // Get chord notes from MusicTheory
         const chordNotes = MusicTheory.getChordNotes(chord.root, chord.type);

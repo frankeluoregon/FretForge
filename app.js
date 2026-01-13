@@ -691,9 +691,18 @@ const App = {
             doneBtn.innerHTML = '<span>✓</span> Done';
             doneBtn.onclick = () => this.toggleFilterMode(index);
             
+            const playBtn = document.createElement('button');
+            playBtn.className = 'filter-btn';
+            playBtn.innerHTML = '<span>▶</span>';
+            playBtn.title = "Preview Selection";
+            playBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.playChord(this.chords[index], 'harmony');
+            };
+
             const clearBtn = document.createElement('button');
             clearBtn.className = 'filter-btn secondary';
-            clearBtn.innerHTML = 'Clear';
+            clearBtn.innerHTML = 'None';
             clearBtn.onclick = () => {
                 this.chords[index].visiblePositions = new Set();
                 this.updateFretboard(index);
@@ -709,6 +718,7 @@ const App = {
                 this.updateFretboard(index);
             };
 
+            container.appendChild(playBtn);
             container.appendChild(doneBtn);
             container.appendChild(resetBtn);
             container.appendChild(clearBtn);
@@ -825,6 +835,11 @@ const App = {
         }
 
         this.updateFretboard(index);
+
+        // Play the active notes (the filtered chord)
+        if (chord.visiblePositions.size > 0) {
+            this.playChord(chord, 'harmony');
+        }
     },
 
     /**
