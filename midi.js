@@ -293,7 +293,12 @@ const MIDIPlayer = {
 
         // Find the lowest Root note >= minMidi
         // Target the 2nd octave range (start of 2nd octave relative to instrument low note)
-        const targetMinMidi = minMidi + 12;
+        let targetMinMidi = minMidi + 12;
+
+        // For bass, override to ensure consistent low register (E1+) across 4/5/6 strings
+        if (instrument.startsWith('bass')) {
+            targetMinMidi = 28; // E1
+        }
 
         // Find the lowest Root note >= targetMinMidi
         let rootMidi = -1;
