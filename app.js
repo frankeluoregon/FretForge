@@ -836,10 +836,9 @@ const App = {
 
         this.updateFretboard(index);
 
-        // Play the active notes (the filtered chord)
-        if (chord.visiblePositions.size > 0) {
-            this.playChord(chord, 'harmony');
-        }
+        // Play ONLY the clicked note for auditioning
+        const tempChord = { ...chord, visiblePositions: new Set([posKey]) };
+        this.playChord(tempChord, 'harmony');
     },
 
     /**
