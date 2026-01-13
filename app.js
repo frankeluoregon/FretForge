@@ -578,6 +578,7 @@ const App = {
             (e) => {
                 const accidental = document.getElementById(`root-accidental-${index}`).value;
                 this.chords[index].root = e.target.value + accidental;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateFretboard(index);
             }
@@ -597,6 +598,7 @@ const App = {
             (e) => {
                 const letter = document.getElementById(`root-letter-${index}`).value;
                 this.chords[index].root = letter + e.target.value;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateFretboard(index);
             }
@@ -620,6 +622,7 @@ const App = {
             this.chords[index].type,
             (e) => {
                 this.chords[index].type = e.target.value;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateModeOptions(index);
                 this.updateFretboard(index);
@@ -637,6 +640,7 @@ const App = {
         modeSelect.id = `mode-type-${index}`;
         modeSelect.addEventListener('change', (e) => {
             this.chords[index].mode = e.target.value;
+            this.resetFilter(index);
             this.updateFretboard(index);
         });
         modeGroup.appendChild(modeLabel);
@@ -714,15 +718,36 @@ const App = {
     },
 
     /**
+     * Reset filter for a chord (used when parameters change)
+     */
+    resetFilter(index) {
+        const chord = this.chords[index];
+        if (chord.visiblePositions || chord.isFiltering) {
+            chord.visiblePositions = null;
+            chord.isFiltering = false;
+
+            // Update Filter UI Controls
+            if (this.currentMode === 'fretboard') {
+                const controlsContainer = document.querySelector(`.chord-section[data-index="${index}"] .chord-controls`);
+                if (controlsContainer) {
+                    const oldFilter = controlsContainer.querySelector('.filter-controls');
+                    if (oldFilter) oldFilter.remove();
+                    controlsContainer.appendChild(this.createFilterControls(index));
+                }
+            }
+        }
+    },
+
+    /**
      * Toggle filter mode for a chord
      */
     toggleFilterMode(index) {
         const chord = this.chords[index];
         chord.isFiltering = !chord.isFiltering;
 
-        // If entering filter mode and no filter exists, initialize it with ALL currently visible notes
+        // If entering filter mode and no filter exists, initialize it with EMPTY set (user selects to keep)
         if (chord.isFiltering && !chord.visiblePositions) {
-            this.initializeFilterSet(index);
+            chord.visiblePositions = new Set();
         }
 
         // Re-render the specific section to update controls and fretboard

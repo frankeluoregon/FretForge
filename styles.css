@@ -585,7 +585,7 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
 }
 
 .fret-marker.dimmed {
-    opacity: 0.2;
+    opacity: 0.5;
     filter: grayscale(100%);
     transform: scale(0.8);
 }
