@@ -834,6 +834,8 @@ const App = {
         const containerId = `fretboard-${index}`;
         const container = document.getElementById(containerId);
 
+        if (!container) return;
+
         // Check if playback controls already exist and save reference
         const existingPlayback = container.querySelector('.playback-container');
 
