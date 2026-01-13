@@ -7,13 +7,13 @@ const MIDIPlayer = {
 
     // Instrument voice mappings for Tone.js
     instruments: {
-        guitar: { type: 'guitar-acoustic', name: 'Acoustic Guitar' },
+        guitar: { type: 'guitar-electric', name: 'Electric Guitar' },
         bass4: { type: 'bass-electric', name: 'Electric Bass' },
         bass5: { type: 'bass-electric', name: 'Electric Bass' },
         bass6: { type: 'bass-electric', name: 'Electric Bass' },
         ukulele: { type: 'guitar-nylon', name: 'Nylon Guitar' },
         mandolin: { type: 'guitar-nylon', name: 'Mandolin' },
-        banjo: { type: 'guitar-acoustic', name: 'Banjo' }
+        banjo: { type: 'guitar-electric', name: 'Banjo' }
     },
 
     /**
@@ -35,34 +35,30 @@ const MIDIPlayer = {
         // Note: We'll use a reduced set of samples for faster loading
         try {
             this.samplers = {
-                'guitar-acoustic': new Tone.Sampler({
+                'guitar-electric': new Tone.Sampler({
                     urls: {
                         A2: "A2.mp3",
                         A3: "A3.mp3",
                         A4: "A4.mp3",
+                        A5: "A5.mp3",
                         C3: "C3.mp3",
                         C4: "C4.mp3",
                         C5: "C5.mp3",
-                        D2: "D2.mp3",
-                        D3: "D3.mp3",
-                        D4: "D4.mp3",
-                        "D#2": "Ds2.mp3",
+                        C6: "C6.mp3",
+                        "C#2": "Cs2.mp3",
                         "D#3": "Ds3.mp3",
                         "D#4": "Ds4.mp3",
+                        "D#5": "Ds5.mp3",
                         E2: "E2.mp3",
-                        E3: "E3.mp3",
-                        E4: "E4.mp3",
                         "F#2": "Fs2.mp3",
                         "F#3": "Fs3.mp3",
                         "F#4": "Fs4.mp3",
-                        G2: "G2.mp3",
-                        G3: "G3.mp3",
-                        G4: "G4.mp3"
+                        "F#5": "Fs5.mp3"
                     },
-                    baseUrl: this.baseUrl + "guitar-acoustic/",
+                    baseUrl: this.baseUrl + "guitar-electric/",
                     release: 1,
                     onload: () => {
-                        console.log('Guitar acoustic samples loaded');
+                        console.log('Guitar electric samples loaded');
                     }
                 }).toDestination(),
 
@@ -132,7 +128,7 @@ const MIDIPlayer = {
             };
 
             // Set volumes
-            this.samplers['guitar-acoustic'].volume.value = -8;
+            this.samplers['guitar-electric'].volume.value = -8;
             this.samplers['guitar-nylon'].volume.value = -8;
             this.samplers['bass-electric'].volume.value = -6; // Louder for pitched-down samples
 
@@ -182,7 +178,7 @@ const MIDIPlayer = {
     initFallbackSynth() {
         console.log('Using fallback synthesis');
         this.samplers = {
-            'guitar-acoustic': new Tone.PolySynth(Tone.Synth, {
+            'guitar-electric': new Tone.PolySynth(Tone.Synth, {
                 oscillator: { type: "fatsawtooth" },
                 envelope: { attack: 0.01, decay: 0.1, sustain: 0.5, release: 0.4 }
             }).toDestination(),
@@ -195,7 +191,7 @@ const MIDIPlayer = {
                 envelope: { attack: 0.01, decay: 0.1, sustain: 0.4, release: 1.4 }
             }).toDestination()
         };
-        this.samplers['guitar-acoustic'].volume.value = -8;
+        this.samplers['guitar-electric'].volume.value = -8;
         this.samplers['guitar-nylon'].volume.value = -8;
         this.samplers['bass-electric'].volume.value = -6;
         this.isInitialized = true;
@@ -443,3 +439,18 @@ const MIDIPlayer = {
         this.activeNotes.clear();
     }
 };
+
+// Auto-initialize audio context on page load with a phantom interaction
+// This removes the need for the first user click to enable audio
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait a moment for page to settle
+    setTimeout(async () => {
+        try {
+            console.log('Auto-initializing audio on page load...');
+            await MIDIPlayer.init();
+            console.log('Audio ready - no click required!');
+        } catch (error) {
+            console.log('Auto-init failed, will initialize on first play:', error);
+        }
+    }, 500);
+});
