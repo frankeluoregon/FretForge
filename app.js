@@ -473,21 +473,19 @@ const App = {
                     (s, f) => this.handleNoteClick(i, s, f) // Click handler
                 );
 
-                // Add playback controls overlay AFTER fretboard is rendered
+                // Add controls to header
                 const fretboardContainer = document.getElementById(`prog-fretboard-${i}`);
                 if (fretboardContainer) {
-                    const playbackContainer = this.createPlaybackControls(i, 'prog');
-                    fretboardContainer.appendChild(playbackContainer);
-                    
-                    // Add filter controls
-                    // Add filter controls to header
                     const section = fretboardContainer.closest('.chord-section');
                     const header = section.querySelector('.chord-header');
-                    const filterControls = this.createFilterControls(i);
-                    // Position it top-right
-                    filterControls.style.cssText = "position: absolute; top: 8px; right: 8px; z-index: 100;";
-                    fretboardContainer.appendChild(filterControls);
-                    if (header) header.appendChild(filterControls);
+                    
+                    const tools = document.createElement('div');
+                    tools.className = 'chord-tools';
+                    
+                    tools.appendChild(this.createFilterControls(i));
+                    tools.appendChild(this.createPlaybackControls(i, 'prog'));
+                    
+                    if (header) header.appendChild(tools);
                 }
             }
         }, 10);
@@ -650,9 +648,12 @@ const App = {
         modeGroup.appendChild(modeSelect);
         controls.appendChild(modeGroup);
 
-        // Add Filter Controls to the main controls area
-        const filterControls = this.createFilterControls(index);
-        controls.appendChild(filterControls);
+        // Create tools wrapper for right alignment
+        const tools = document.createElement('div');
+        tools.className = 'chord-tools';
+        tools.appendChild(this.createFilterControls(index));
+        tools.appendChild(this.createPlaybackControls(index, 'fretboard'));
+        controls.appendChild(tools);
 
         section.appendChild(controls);
 
@@ -662,7 +663,7 @@ const App = {
         fretboardContainer.className = 'fretboard-container';
         section.appendChild(fretboardContainer);
 
-        // Populate mode options and render (playback controls added by updateFretboard)
+        // Populate mode options and render
         setTimeout(() => {
             this.updateModeOptions(index);
             this.updateFretboard(index);
@@ -740,13 +741,10 @@ const App = {
             chord.isFiltering = false;
 
             // Update Filter UI Controls
-            if (this.currentMode === 'fretboard') {
-                const controlsContainer = document.querySelector(`.chord-section[data-index="${index}"] .chord-controls`);
-                if (controlsContainer) {
-                    const oldFilter = controlsContainer.querySelector('.filter-controls');
-                    if (oldFilter) oldFilter.remove();
-                    controlsContainer.appendChild(this.createFilterControls(index));
-                }
+            const section = document.querySelector(`.chord-section[data-index="${index}"]`);
+            const oldFilter = section ? section.querySelector('.filter-controls') : null;
+            if (oldFilter) {
+                oldFilter.replaceWith(this.createFilterControls(index));
             }
         }
     },
@@ -765,18 +763,10 @@ const App = {
 
         // Re-render the specific section to update controls and fretboard
         if (this.currentMode === 'fretboard') {
-            // In chord select, we can just re-render the whole list or update specific parts.
-            // For simplicity in updating the button state in the DOM, we'll re-render the whole board logic
-            // but we can just call updateFretboard and manually update the button container.
-            // Actually, easiest is to re-render the controls area or just the button.
-            // Let's just re-render the whole list for safety, or better, just update this index.
-            const controlsContainer = document.querySelector(`.chord-section[data-index="${index}"] .chord-controls`);
-            if (controlsContainer) {
-                // Remove old filter controls
-                const oldFilter = controlsContainer.querySelector('.filter-controls');
-                if (oldFilter) oldFilter.remove();
-                // Add new ones
-                controlsContainer.appendChild(this.createFilterControls(index));
+            const section = document.querySelector(`.chord-section[data-index="${index}"]`);
+            const oldFilter = section ? section.querySelector('.filter-controls') : null;
+            if (oldFilter) {
+                oldFilter.replaceWith(this.createFilterControls(index));
             }
             this.updateFretboard(index);
         } else {
@@ -1005,9 +995,6 @@ const App = {
 
         if (!container) return;
 
-        // Check if playback controls already exist and save reference
-        const existingPlayback = container.querySelector('.playback-container');
-
         Fretboard.renderFretboard(
             containerId,
             chord.root,
@@ -1020,22 +1007,6 @@ const App = {
             chord.isFiltering,
             (s, f) => this.handleNoteClick(index, s, f)
         );
-
-        // Re-add playback controls if they existed
-        if (existingPlayback) {
-            container.appendChild(existingPlayback);
-        } else {
-            // If no existing controls, create them
-            const playbackContainer = this.createPlaybackControls(index, 'fretboard');
-            container.appendChild(playbackContainer);
-        }
-
-        // Re-add filter controls for progression mode (since they are inside the container there)
-        if (this.currentMode === 'progression') {
-             const filterControls = this.createFilterControls(index);
-             filterControls.style.cssText = "position: absolute; top: 8px; right: 8px; z-index: 100;";
-             container.appendChild(filterControls);
-        }
     },
 
     /**

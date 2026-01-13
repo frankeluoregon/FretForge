@@ -414,6 +414,13 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     opacity: 1 !important;
 }
 
+.chord-tools {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+}
+
 /* Filter Controls */
 .filter-controls {
     display: flex;
