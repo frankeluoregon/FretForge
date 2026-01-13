@@ -104,19 +104,19 @@ const MIDIPlayer = {
                 'bass-electric': new Tone.Sampler({
                     urls: {
                         // Use electric guitar samples pitched down by mapping to lower octaves
-                        A1: "A2.mp3",
-                        A2: "A3.mp3",
-                        A3: "A4.mp3",
-                        C2: "C3.mp3",
-                        C3: "C4.mp3",
-                        C4: "C5.mp3",
-                        "C#1": "Cs2.mp3",
-                        "D#2": "Ds3.mp3",
-                        "D#3": "Ds4.mp3",
-                        E1: "E2.mp3",
-                        "F#1": "Fs2.mp3",
-                        "F#2": "Fs3.mp3",
-                        "F#3": "Fs4.mp3"
+                        A2: "A2.mp3",
+                        A3: "A3.mp3",
+                        A4: "A4.mp3",
+                        C3: "C3.mp3",
+                        C4: "C4.mp3",
+                        C5: "C5.mp3",
+                        "C#2": "Cs2.mp3",
+                        "D#3": "Ds3.mp3",
+                        "D#4": "Ds4.mp3",
+                        E2: "E2.mp3",
+                        "F#2": "Fs2.mp3",
+                        "F#3": "Fs3.mp3",
+                        "F#4": "Fs4.mp3"
                     },
                     baseUrl: this.baseUrl + "guitar-electric/",
                     release: 1.5, // Longer release for bass character
@@ -248,33 +248,73 @@ const MIDIPlayer = {
      */
     getChordMidiNotes(chord, instrument) {
         const notes = [];
-        const tuning = Fretboard.tunings[instrument] || Fretboard.tuning;
+        // Use Fretboard.tuning if instruments match to support alternate tunings
+        const tuning = (instrument === Fretboard.currentInstrument) ? Fretboard.tuning : (Fretboard.tunings[instrument] || Fretboard.tuning);
 
         // Get base octaves for each string based on instrument
         const baseOctaves = this.getBaseOctaves(instrument);
 
-        // Get chord notes from MusicTheory
-        const chordNotes = MusicTheory.getChordNotes(chord.root, chord.type);
-
-        // For each string, find the first occurrence of a chord tone
-        tuning.forEach((openNote, stringIndex) => {
-            const baseOctave = baseOctaves[stringIndex];
-
-            // Check frets 0-12 for chord tones
-            for (let fret = 0; fret <= 12; fret++) {
-                const note = Fretboard.getNoteAtPosition(stringIndex, fret);
-                const isChordTone = chordNotes.some(chordNote =>
-                    MusicTheory.areNotesEqual(note, chordNote)
-                );
-
-                if (isChordTone) {
-                    // Calculate octave based on fret position
-                    const octave = baseOctave + Math.floor(fret / 12);
-                    const midiNote = this.noteToMidi(note.replace('#', '#') + octave);
-                    notes.push(midiNote);
-                    break; // Move to next string
-                }
+        // If filter is active (visiblePositions exists), play only selected notes
+        if (chord.visiblePositions) {
+            if (chord.visiblePositions.size === 0) {
+                console.warn('Filter active but no notes selected - playing silence');
+                return [];
             }
+
+            chord.visiblePositions.forEach(pos => {
+                const parts = pos.split('-');
+                const stringIndex = parseInt(parts[0]);
+                const fret = parseInt(parts[1]);
+                
+                // Ensure string exists on current instrument
+                if (stringIndex < tuning.length) {
+                    // Calculate note locally to avoid dependency on Fretboard UI state
+                    const openNoteName = tuning[stringIndex];
+                    const baseOctave = baseOctaves[stringIndex];
+                    const openMidi = this.noteToMidi(openNoteName + baseOctave);
+                    const midiNote = openMidi + fret;
+                    notes.push(midiNote);
+                }
+            });
+            return notes;
+        }
+
+        // Play simple one-octave voicing for unfiltered chords
+        const intervals = MusicTheory.chords[chord.type];
+        if (!intervals) return [];
+
+        // Find the lowest playable MIDI note on the instrument
+        let minMidi = 127;
+        tuning.forEach((note, index) => {
+            const octave = baseOctaves[index];
+            const midi = this.noteToMidi(note + octave);
+            if (midi < minMidi) minMidi = midi;
+        });
+
+        // Find the lowest Root note >= minMidi
+        // Target the 2nd octave range (start of 2nd octave relative to instrument low note)
+        let targetMinMidi = minMidi + 12;
+
+        // For bass, override to ensure consistent low register (E1+) across 4/5/6 strings
+        if (instrument.startsWith('bass')) {
+            targetMinMidi = 28; // E1
+        }
+
+        // Find the lowest Root note >= targetMinMidi
+        let rootMidi = -1;
+        for (let oct = 0; oct <= 8; oct++) {
+            const testMidi = this.noteToMidi(chord.root + oct);
+            if (testMidi >= targetMinMidi) {
+                rootMidi = testMidi;
+                break;
+            }
+        }
+        
+        if (rootMidi === -1) rootMidi = this.noteToMidi(chord.root + 4);
+
+        // Generate chord notes
+        intervals.forEach(interval => {
+            notes.push(rootMidi + interval);
         });
 
         return notes;
@@ -288,10 +328,10 @@ const MIDIPlayer = {
             guitar: [4, 3, 3, 3, 2, 2], // E4, B3, G3, D3, A2, E2
             bass4: [2, 2, 1, 1],         // G2, D2, A1, E1
             bass5: [2, 2, 1, 1, 0],      // G2, D2, A1, E1, B0
-            bass6: [2, 2, 2, 1, 1, 0],   // C2, G2, D2, A1, E1, B0
-            ukulele: [4, 4, 4, 3],       // A4, E4, C4, G3 (reentrant)
-            mandolin: [4, 4, 3, 3, 3, 3, 2, 2], // E4, E4, A3, A3, D3, D3, G2, G2
-            banjo: [4, 3, 3, 2, 2]       // D4, B3, G3, D2, G2
+            bass6: [3, 2, 2, 1, 1, 0],   // C3, G2, D2, A1, E1, B0
+            ukulele: [4, 4, 4, 4],       // A4, E4, C4, G4 (High G)
+            mandolin: [5, 5, 4, 4, 4, 4, 3, 3], // E5, E5, A4, A4, D4, D4, G3, G3
+            banjo: [4, 3, 3, 3, 4]       // D4, B3, G3, D3, G4 (High G 5th string)
         };
 
         return octaveMap[instrument] || octaveMap.guitar;
@@ -349,11 +389,24 @@ const MIDIPlayer = {
 
             const strumDelay = 0.05; // 50ms between notes
 
-            midiNotes.forEach((midiNote, index) => {
-                const toneNote = this.midiToToneNote(midiNote);
-                const startTime = '+' + (index * strumDelay);
-                sampler.triggerAttackRelease(toneNote, duration, startTime);
-            });
+            if (instrument === 'mandolin') {
+                const courseDelay = 0.01; // Very tight delay for mandolin courses
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = index * strumDelay;
+                    
+                    // First string of course
+                    sampler.triggerAttackRelease(toneNote, duration, '+' + startTime);
+                    // Second string of course
+                    sampler.triggerAttackRelease(toneNote, duration, '+' + (startTime + courseDelay));
+                });
+            } else {
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = '+' + (index * strumDelay);
+                    sampler.triggerAttackRelease(toneNote, duration, startTime);
+                });
+            }
             console.log('Triggered strum');
         } catch (error) {
             console.error('Error playing strum:', error);
@@ -391,11 +444,24 @@ const MIDIPlayer = {
             const noteDelay = duration / midiNotes.length;
             const noteDuration = noteDelay * 1.2; // Slight overlap
 
-            midiNotes.forEach((midiNote, index) => {
-                const toneNote = this.midiToToneNote(midiNote);
-                const startTime = '+' + (index * noteDelay);
-                sampler.triggerAttackRelease(toneNote, noteDuration, startTime);
-            });
+            if (instrument === 'mandolin') {
+                const courseDelay = 0.01; // Very tight delay for mandolin courses
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = index * noteDelay;
+                    
+                    // First string of course
+                    sampler.triggerAttackRelease(toneNote, noteDuration, '+' + startTime);
+                    // Second string of course
+                    sampler.triggerAttackRelease(toneNote, noteDuration, '+' + (startTime + courseDelay));
+                });
+            } else {
+                midiNotes.forEach((midiNote, index) => {
+                    const toneNote = this.midiToToneNote(midiNote);
+                    const startTime = '+' + (index * noteDelay);
+                    sampler.triggerAttackRelease(toneNote, noteDuration, startTime);
+                });
+            }
             console.log('Triggered arpeggio');
         } catch (error) {
             console.error('Error playing arpeggio:', error);

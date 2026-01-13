@@ -192,13 +192,13 @@
                     </select>
 
                     <!-- Play Progression Button with Flyout -->
-                    <div class="playback-container" id="progression-playback-container" style="position: relative;">
-                        <button id="play-progression-btn" class="playback-button">▶ Play Progression</button>
-                        <div class="playback-flyout" id="progression-playback-flyout">
-                            <button class="playback-mode-btn" data-mode="harmony">🎵 Harmony</button>
-                            <button class="playback-mode-btn" data-mode="strum">🎸 Strum</button>
-                            <button class="playback-mode-btn" data-mode="arpeggio">🎼 Arpeggio</button>
+                    <div class="playback-container playback-controls-compact" id="progression-playback-container">
+                        <div class="playback-toggle-group" id="progression-mode-toggle">
+                            <button class="toggle-btn" data-mode="harmony" title="Harmony">unis</button>
+                            <button class="toggle-btn active" data-mode="strum" title="Strum">strum</button>
+                            <button class="toggle-btn" data-mode="arpeggio" title="Arpeggio">arp</button>
                         </div>
+                        <button id="play-progression-btn" class="compact-play-btn" title="Play Progression">▶</button>
                     </div>
                 </div>
             </div>

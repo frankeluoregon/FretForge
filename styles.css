@@ -414,6 +414,55 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     opacity: 1 !important;
 }
 
+.chord-tools {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* Filter Controls */
+.filter-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.filter-btn {
+    background: #2a1f1a;
+    color: #c9a887;
+    border: 1px solid #5c2f1f;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 0.85em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    min-height: 32px; /* Smaller than main buttons */
+}
+
+.filter-btn:hover {
+    background: #3d2f27;
+    color: #ffe4b5;
+}
+
+.filter-btn.active {
+    background: #8d5524;
+    color: #ffe4b5;
+    border-color: #f4a460;
+}
+
+.filter-btn.secondary {
+    background: transparent;
+    border-color: #3d2f27;
+}
+
+.filter-btn span {
+    font-size: 1.1em;
+}
+
 .chord-section {
     background: #1f1813;
     border-radius: 12px;
@@ -536,6 +585,16 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     border: 2px solid transparent;
     position: relative;
     z-index: 1;
+}
+
+.fret-marker.interactive {
+    cursor: pointer;
+}
+
+.fret-marker.dimmed {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    transform: scale(0.8);
 }
 
 .fret-marker:hover {
@@ -881,110 +940,76 @@ body:has(#fretboard-page.active) .legend .leading-note-legend {
     font-size: 1.1em;
 }
 
-/* MIDI Playback Controls */
-.playback-button {
-    background: #8d5524;
-    color: #ffe4b5;
-    border: 2px solid #f4a460;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 0.9em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex !important;
-    align-items: center;
-    gap: 6px;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.playback-button:hover {
-    background: #a66929;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(141, 85, 36, 0.4);
-}
-
-.playback-button:active {
-    transform: translateY(0);
-}
-
-.playback-button.playing {
-    background: #6b7c3a;
-    border-color: #8d9f55;
-}
-
-.playback-flyout {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 8px;
-    background: #1a1410;
-    border: 2px solid #5c2f1f;
-    border-radius: 8px;
-    padding: 16px;
-    min-width: 280px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-    z-index: 100;
-    display: none;
-}
-
-.playback-flyout.active {
-    display: block;
-}
-
-.playback-flyout h4 {
-    color: #f4a460;
-    font-size: 1em;
-    margin-bottom: 12px;
-    font-weight: bold;
-}
-
-.playback-modes {
+/* Compact Playback Controls */
+.playback-controls-compact {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 8px;
+    background: rgba(26, 20, 16, 0.9);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid #5c2f1f;
 }
 
-.playback-mode-btn {
-    background: #2a1f1a;
-    color: #c9a887;
-    border: 2px solid #3d2f27;
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-size: 0.95em;
+.playback-toggle-group {
+    display: flex;
+    background: #1f1813;
+    border: 1px solid #3d2f27;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: #8d7a6a;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    text-align: left;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
 }
 
-.playback-mode-btn:hover {
-    background: #3d2f27;
-    border-color: #5c2f1f;
-    transform: translateX(2px);
+.toggle-btn:hover {
+    color: #ffe4b5;
+    background: rgba(141, 85, 36, 0.2);
 }
 
-.playback-mode-btn:active {
-    transform: translateX(0);
+.toggle-btn.active {
+    background: #8d5524;
+    color: #ffe4b5;
 }
 
-.playback-mode-btn .icon {
-    font-size: 1.2em;
-    min-width: 20px;
-    text-align: center;
+.compact-play-btn {
+    background: #8d5524;
+    color: #ffe4b5;
+    border: 1px solid #f4a460;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
 }
 
-.playback-mode-btn .label {
-    flex: 1;
+.compact-play-btn:hover {
+    background: #a66929;
+    transform: translateY(-1px);
 }
 
-.playback-mode-btn .description {
-    font-size: 0.8em;
-    color: #8d7a6a;
-    margin-top: 2px;
+.compact-play-btn:active {
+    transform: translateY(0);
 }
 
 .playback-controls-wrapper {

@@ -311,26 +311,21 @@ const App = {
         });
 
         // Progression playback controls in toolbar
+        const progressionToggleGroup = document.getElementById('progression-mode-toggle');
         const playProgressionBtn = document.getElementById('play-progression-btn');
-        const progressionFlyout = document.getElementById('progression-playback-flyout');
 
-        playProgressionBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = progressionFlyout.style.display === 'block';
-            // Close all flyouts
-            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
-            // Toggle this flyout
-            progressionFlyout.style.display = isVisible ? 'none' : 'block';
+        // Toggle buttons logic
+        progressionToggleGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                progressionToggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
         });
 
-        // Mode button handlers for progression playback
-        progressionFlyout.querySelectorAll('.playback-mode-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const playbackMode = btn.dataset.mode;
-                this.playProgression(playbackMode);
-                progressionFlyout.style.display = 'none';
-            });
+        playProgressionBtn.addEventListener('click', (e) => {
+            const activeBtn = progressionToggleGroup.querySelector('.toggle-btn.active');
+            const mode = activeBtn ? activeBtn.dataset.mode : 'strum';
+            this.playProgression(mode);
         });
 
         // Export to PDF button - now shows orientation selector
@@ -343,13 +338,6 @@ const App = {
                 document.getElementById('pdf-orientation').focus();
             } else {
                 orientationGroup.style.display = 'none';
-            }
-        });
-
-        // Close flyouts when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.playback-container')) {
-                document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
             }
         });
     },
@@ -479,14 +467,25 @@ const App = {
                     chord.mode,
                     nextChordRoot,
                     this.showLeadingNotes,  // Use toggle value
-                    this.showScaleNotes     // Use toggle value
+                    this.showScaleNotes,    // Use toggle value
+                    chord.visiblePositions, // Filter set
+                    chord.isFiltering,      // Filter mode active?
+                    (s, f) => this.handleNoteClick(i, s, f) // Click handler
                 );
 
-                // Add playback controls overlay AFTER fretboard is rendered
+                // Add controls to header
                 const fretboardContainer = document.getElementById(`prog-fretboard-${i}`);
                 if (fretboardContainer) {
-                    const playbackContainer = this.createPlaybackControls(i, 'prog');
-                    fretboardContainer.appendChild(playbackContainer);
+                    const section = fretboardContainer.closest('.chord-section');
+                    const header = section.querySelector('.chord-header');
+                    
+                    const tools = document.createElement('div');
+                    tools.className = 'chord-tools';
+                    
+                    tools.appendChild(this.createFilterControls(i));
+                    tools.appendChild(this.createPlaybackControls(i, 'prog'));
+                    
+                    if (header) header.appendChild(tools);
                 }
             }
         }, 10);
@@ -498,6 +497,15 @@ const App = {
     createProgressionChordSection(index) {
         const section = document.createElement('div');
         section.className = 'chord-section';
+        section.dataset.index = index;
+
+        // Create header for label and controls
+        const header = document.createElement('div');
+        header.className = 'chord-header';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '10px';
 
         // Create label showing chord numeral and name
         const label = document.createElement('div');
@@ -505,6 +513,8 @@ const App = {
         const chord = this.chords[index];
         label.textContent = `${chord.numeral || index + 1} - ${chord.root} ${this.getChordTypeName(chord.type)} (${this.getModeName(chord.mode)})`;
         section.appendChild(label);
+        header.appendChild(label);
+        section.appendChild(header);
 
         // Create fretboard container
         const fretboardContainer = document.createElement('div');
@@ -569,6 +579,7 @@ const App = {
             (e) => {
                 const accidental = document.getElementById(`root-accidental-${index}`).value;
                 this.chords[index].root = e.target.value + accidental;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateFretboard(index);
             }
@@ -588,6 +599,7 @@ const App = {
             (e) => {
                 const letter = document.getElementById(`root-letter-${index}`).value;
                 this.chords[index].root = letter + e.target.value;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateFretboard(index);
             }
@@ -611,6 +623,7 @@ const App = {
             this.chords[index].type,
             (e) => {
                 this.chords[index].type = e.target.value;
+                this.resetFilter(index);
                 this.updateChordLabel(index);
                 this.updateModeOptions(index);
                 this.updateFretboard(index);
@@ -628,11 +641,19 @@ const App = {
         modeSelect.id = `mode-type-${index}`;
         modeSelect.addEventListener('change', (e) => {
             this.chords[index].mode = e.target.value;
+            this.resetFilter(index);
             this.updateFretboard(index);
         });
         modeGroup.appendChild(modeLabel);
         modeGroup.appendChild(modeSelect);
         controls.appendChild(modeGroup);
+
+        // Create tools wrapper for right alignment
+        const tools = document.createElement('div');
+        tools.className = 'chord-tools';
+        tools.appendChild(this.createFilterControls(index));
+        tools.appendChild(this.createPlaybackControls(index, 'fretboard'));
+        controls.appendChild(tools);
 
         section.appendChild(controls);
 
@@ -642,13 +663,175 @@ const App = {
         fretboardContainer.className = 'fretboard-container';
         section.appendChild(fretboardContainer);
 
-        // Populate mode options and render (playback controls added by updateFretboard)
+        // Populate mode options and render
         setTimeout(() => {
             this.updateModeOptions(index);
             this.updateFretboard(index);
         }, 0);
 
         return section;
+    },
+
+    /**
+     * Create filter controls (Filter / Done / Clear)
+     */
+    createFilterControls(index) {
+        const container = document.createElement('div');
+        container.className = 'filter-controls';
+        
+        const chord = this.chords[index];
+        const isFiltering = chord.isFiltering;
+
+        if (!isFiltering) {
+            const filterBtn = document.createElement('button');
+            filterBtn.className = 'filter-btn';
+            filterBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4c2.01 2.59 7 9 7 9v7h4v-7s4.98-6.41 7-9H3z"/></svg> Filter';
+            filterBtn.title = "Select specific notes to keep";
+            filterBtn.onclick = () => this.toggleFilterMode(index);
+            container.appendChild(filterBtn);
+        } else {
+            const doneBtn = document.createElement('button');
+            doneBtn.className = 'filter-btn active';
+            doneBtn.innerHTML = '<span>✓</span> Done';
+            doneBtn.onclick = () => this.toggleFilterMode(index);
+            
+            const playBtn = document.createElement('button');
+            playBtn.className = 'filter-btn';
+            playBtn.innerHTML = '<span>▶</span>';
+            playBtn.title = "Preview Selection";
+            playBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.playChord(this.chords[index], 'harmony');
+            };
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'filter-btn secondary';
+            clearBtn.innerHTML = 'None';
+            clearBtn.onclick = () => {
+                this.chords[index].visiblePositions = new Set();
+                this.updateFretboard(index);
+            };
+
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'filter-btn secondary';
+            resetBtn.innerHTML = 'All';
+            resetBtn.onclick = () => {
+                this.chords[index].visiblePositions = null; // Null means "show all"
+                // We need to re-initialize the set with all valid notes for the UI
+                this.initializeFilterSet(index);
+                this.updateFretboard(index);
+            };
+
+            container.appendChild(playBtn);
+            container.appendChild(doneBtn);
+            container.appendChild(resetBtn);
+            container.appendChild(clearBtn);
+        }
+
+        return container;
+    },
+
+    /**
+     * Reset filter for a chord (used when parameters change)
+     */
+    resetFilter(index) {
+        const chord = this.chords[index];
+        if (chord.visiblePositions || chord.isFiltering) {
+            chord.visiblePositions = null;
+            chord.isFiltering = false;
+
+            // Update Filter UI Controls
+            const section = document.querySelector(`.chord-section[data-index="${index}"]`);
+            const oldFilter = section ? section.querySelector('.filter-controls') : null;
+            if (oldFilter) {
+                oldFilter.replaceWith(this.createFilterControls(index));
+            }
+        }
+    },
+
+    /**
+     * Toggle filter mode for a chord
+     */
+    toggleFilterMode(index) {
+        const chord = this.chords[index];
+        chord.isFiltering = !chord.isFiltering;
+
+        // If entering filter mode and no filter exists, initialize it with EMPTY set (user selects to keep)
+        if (chord.isFiltering && !chord.visiblePositions) {
+            chord.visiblePositions = new Set();
+        }
+
+        // Re-render the specific section to update controls and fretboard
+        if (this.currentMode === 'fretboard') {
+            const section = document.querySelector(`.chord-section[data-index="${index}"]`);
+            const oldFilter = section ? section.querySelector('.filter-controls') : null;
+            if (oldFilter) {
+                oldFilter.replaceWith(this.createFilterControls(index));
+            }
+            this.updateFretboard(index);
+        } else {
+            // In progression mode, re-render the whole display is safest/easiest
+            this.renderProgressionDisplay();
+        }
+    },
+
+    /**
+     * Initialize the filter set with all currently valid notes
+     */
+    initializeFilterSet(index) {
+        const chord = this.chords[index];
+        const visibleSet = new Set();
+        
+        // We need to simulate the logic in Fretboard.updateFretboard to know what's valid
+        // This is a bit redundant but necessary to populate the initial state correctly
+        const chordNotes = MusicTheory.getChordNotes(chord.root, chord.type);
+        const scaleNotes = MusicTheory.getScaleNotes(chord.root, chord.mode);
+        const nextChordRoot = (this.currentMode === 'progression' && index < this.chords.length - 1) ? this.chords[index+1].root : null;
+
+        for (let s = 0; s < Fretboard.tuning.length; s++) {
+            for (let f = 0; f <= Fretboard.numFrets; f++) {
+                const note = Fretboard.getNoteAtPosition(s, f);
+                
+                const isChordTone = chordNotes.some(n => MusicTheory.areNotesEqual(note, n));
+                const isScaleNote = scaleNotes.some(n => MusicTheory.areNotesEqual(note, n));
+                const leadingNote = this.showLeadingNotes && nextChordRoot ? MusicTheory.transposeNote(nextChordRoot, -1) : null;
+                const isLeadingNote = leadingNote && MusicTheory.areNotesEqual(note, leadingNote);
+                
+                const shouldShowScaleNote = this.showScaleNotes && isScaleNote && !isChordTone;
+
+                if (isChordTone || shouldShowScaleNote || isLeadingNote) {
+                    visibleSet.add(`${s}-${f}`);
+                }
+            }
+        }
+        chord.visiblePositions = visibleSet;
+    },
+
+    /**
+     * Handle clicking a note in filter mode
+     */
+    handleNoteClick(index, string, fret) {
+        const chord = this.chords[index];
+        if (!chord.isFiltering) return;
+
+        const posKey = `${string}-${fret}`;
+        
+        // Ensure set exists
+        if (!chord.visiblePositions) {
+            chord.visiblePositions = new Set();
+        }
+
+        if (chord.visiblePositions.has(posKey)) {
+            chord.visiblePositions.delete(posKey);
+        } else {
+            chord.visiblePositions.add(posKey);
+        }
+
+        this.updateFretboard(index);
+
+        // Play ONLY the clicked note for auditioning
+        const tempChord = { ...chord, visiblePositions: new Set([posKey]) };
+        this.playChord(tempChord, 'harmony');
     },
 
     /**
@@ -685,64 +868,51 @@ const App = {
      */
     createPlaybackControls(index, mode) {
         const container = document.createElement('div');
-        container.className = 'playback-container';
-        container.style.position = 'relative';
+        container.className = 'playback-container playback-controls-compact';
+        
+        // Default mode
+        let currentMode = 'strum';
 
-        // Create playback button
-        const playButton = document.createElement('button');
-        playButton.className = 'playback-button';
-        playButton.innerHTML = '▶ Play';
-        playButton.dataset.index = index;
-        playButton.dataset.mode = mode;
+        // Toggle Container
+        const toggleGroup = document.createElement('div');
+        toggleGroup.className = 'playback-toggle-group';
 
-        // Create flyout
-        const flyout = document.createElement('div');
-        flyout.className = 'playback-flyout';
-        flyout.dataset.index = index;
+        const modes = [
+            { id: 'harmony', label: 'unis', title: 'Harmony' },
+            { id: 'strum', label: 'strum', title: 'Strum' },
+            { id: 'arpeggio', label: 'arp', title: 'Arpeggio' }
+        ];
 
-        // Create mode buttons
-        const harmonyBtn = document.createElement('button');
-        harmonyBtn.className = 'playback-mode-btn';
-        harmonyBtn.textContent = '🎵 Harmony';
-        harmonyBtn.dataset.playbackMode = 'harmony';
-
-        const strumBtn = document.createElement('button');
-        strumBtn.className = 'playback-mode-btn';
-        strumBtn.textContent = '🎸 Strum';
-        strumBtn.dataset.playbackMode = 'strum';
-
-        const arpeggioBtn = document.createElement('button');
-        arpeggioBtn.className = 'playback-mode-btn';
-        arpeggioBtn.textContent = '🎼 Arpeggio';
-        arpeggioBtn.dataset.playbackMode = 'arpeggio';
-
-        flyout.appendChild(harmonyBtn);
-        flyout.appendChild(strumBtn);
-        flyout.appendChild(arpeggioBtn);
-
-        container.appendChild(playButton);
-        container.appendChild(flyout);
-
-        // Event listeners
-        playButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = flyout.style.display === 'block';
-            // Close all other flyouts
-            document.querySelectorAll('.playback-flyout').forEach(f => f.style.display = 'none');
-            // Toggle this flyout
-            flyout.style.display = isVisible ? 'none' : 'block';
-        });
-
-        // Mode button handlers
-        [harmonyBtn, strumBtn, arpeggioBtn].forEach(btn => {
+        modes.forEach(m => {
+            const btn = document.createElement('button');
+            btn.className = `toggle-btn ${m.id === currentMode ? 'active' : ''}`;
+            btn.innerHTML = m.label;
+            btn.title = m.title;
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const playbackMode = btn.dataset.playbackMode;
-                const chord = this.chords[index];
-                this.playChord(chord, playbackMode);
-                flyout.style.display = 'none';
+                // Update UI
+                toggleGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = m.id;
             });
+            toggleGroup.appendChild(btn);
         });
+
+        // Play Button
+        const playBtn = document.createElement('button');
+        playBtn.className = 'compact-play-btn';
+        playBtn.innerHTML = '▶';
+        playBtn.title = 'Play';
+        playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this.chords[index]) {
+                const chord = this.chords[index];
+                this.playChord(chord, currentMode);
+            }
+        });
+
+        container.appendChild(toggleGroup);
+        container.appendChild(playBtn);
 
         return container;
     },
@@ -825,9 +995,6 @@ const App = {
 
         if (!container) return;
 
-        // Check if playback controls already exist and save reference
-        const existingPlayback = container.querySelector('.playback-container');
-
         Fretboard.renderFretboard(
             containerId,
             chord.root,
@@ -835,17 +1002,11 @@ const App = {
             chord.mode,
             null,  // nextChordRoot (not used in chord select)
             false, // showLeadingNotes (not used in chord select)
-            this.showScaleNotes  // Use toggle value
+            this.showScaleNotes,  // Use toggle value
+            chord.visiblePositions,
+            chord.isFiltering,
+            (s, f) => this.handleNoteClick(index, s, f)
         );
-
-        // Re-add playback controls if they existed
-        if (existingPlayback) {
-            container.appendChild(existingPlayback);
-        } else {
-            // If no existing controls, create them
-            const playbackContainer = this.createPlaybackControls(index, 'fretboard');
-            container.appendChild(playbackContainer);
-        }
     },
 
     /**
@@ -975,6 +1136,11 @@ const App = {
         for (let stringIndex = 0; stringIndex < numStrings; stringIndex++) {
             for (let fret = 0; fret <= numFrets; fret++) {
                 const note = Fretboard.getNoteAtPosition(stringIndex, fret);
+                
+                // Check Filter
+                const posKey = `${stringIndex}-${fret}`;
+                if (chord.visiblePositions && !chord.visiblePositions.has(posKey)) continue;
+
                 const isChordTone = chordNotes.some(n => MusicTheory.areNotesEqual(note, n));
                 const isScaleNote = scaleNotes.some(n => MusicTheory.areNotesEqual(note, n));
                 const isRoot = MusicTheory.areNotesEqual(note, chord.root);
