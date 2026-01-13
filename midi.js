@@ -107,28 +107,26 @@ const MIDIPlayer = {
 
                 'bass-electric': new Tone.Sampler({
                     urls: {
-                        "A#1": "As1.mp3",
-                        "A#2": "As2.mp3",
-                        "A#3": "As3.mp3",
-                        "A#4": "As4.mp3",
-                        "C#1": "Cs1.mp3",
-                        "C#2": "Cs2.mp3",
-                        "C#3": "Cs3.mp3",
-                        "C#4": "Cs4.mp3",
-                        "C#5": "Cs5.mp3",
-                        E1: "E1.mp3",
-                        E2: "E2.mp3",
-                        E3: "E3.mp3",
-                        E4: "E4.mp3",
-                        G1: "G1.mp3",
-                        G2: "G2.mp3",
-                        G3: "G3.mp3",
-                        G4: "G4.mp3"
+                        // Use guitar samples pitched down by mapping to lower octaves
+                        A1: "A2.mp3",
+                        A2: "A3.mp3",
+                        C2: "C3.mp3",
+                        C3: "C4.mp3",
+                        D1: "D2.mp3",
+                        D2: "D3.mp3",
+                        "D#1": "Ds2.mp3",
+                        "D#2": "Ds3.mp3",
+                        E1: "E2.mp3",
+                        E2: "E3.mp3",
+                        "F#1": "Fs2.mp3",
+                        "F#2": "Fs3.mp3",
+                        G1: "G2.mp3",
+                        G2: "G3.mp3"
                     },
-                    baseUrl: this.baseUrl + "bass-electric/",
-                    release: 1,
+                    baseUrl: this.baseUrl + "guitar-acoustic/",
+                    release: 1.5, // Longer release for bass character
                     onload: () => {
-                        console.log('Bass electric samples loaded');
+                        console.log('Bass electric samples loaded (using pitched guitar)');
                     }
                 }).toDestination()
             };
@@ -136,7 +134,7 @@ const MIDIPlayer = {
             // Set volumes
             this.samplers['guitar-acoustic'].volume.value = -8;
             this.samplers['guitar-nylon'].volume.value = -8;
-            this.samplers['bass-electric'].volume.value = -10;
+            this.samplers['bass-electric'].volume.value = -6; // Louder for pitched-down samples
 
             this.isInitialized = true;
             console.log('All samplers initialized');
@@ -199,7 +197,7 @@ const MIDIPlayer = {
         };
         this.samplers['guitar-acoustic'].volume.value = -8;
         this.samplers['guitar-nylon'].volume.value = -8;
-        this.samplers['bass-electric'].volume.value = -10;
+        this.samplers['bass-electric'].volume.value = -6;
         this.isInitialized = true;
     },
 
