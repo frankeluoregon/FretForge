@@ -642,14 +642,10 @@ const App = {
         fretboardContainer.className = 'fretboard-container';
         section.appendChild(fretboardContainer);
 
-        // Populate mode options and render, then add playback controls
+        // Populate mode options and render (playback controls added by updateFretboard)
         setTimeout(() => {
             this.updateModeOptions(index);
             this.updateFretboard(index);
-
-            // Add playback controls overlay AFTER fretboard is rendered
-            const playbackContainer = this.createPlaybackControls(index, 'fretboard');
-            fretboardContainer.appendChild(playbackContainer);
         }, 0);
 
         return section;
