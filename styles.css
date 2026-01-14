@@ -292,6 +292,8 @@ body {
     mask-size: contain;
     -webkit-mask-position: left center;
     mask-position: left center;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
 }
 
 /* Apply the offset to your page content wrappers */
