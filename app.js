@@ -5,6 +5,7 @@ const App = {
     currentInstrument: 'guitar',
     numChords: 4,
     chords: [],
+    currentTheme: 'default',
     pdfOrientation: 'landscape', // 'portrait' or 'landscape'
 
     // Progression mode settings
@@ -17,6 +18,9 @@ const App = {
      * Initialize the application
      */
     init() {
+        // Load saved settings
+        this.loadSettings();
+
         // Initialize chord progression with defaults
         this.initializeChords();
 
@@ -40,6 +44,9 @@ const App = {
 
         // Render the initial mode
         this.renderFretboards();
+
+        // Ensure favicon matches theme
+        this.updateFavicon();
     },
 
     /**
@@ -189,6 +196,7 @@ const App = {
         instrumentSelect.addEventListener('change', (e) => {
             this.currentInstrument = e.target.value;
             Fretboard.setInstrument(this.currentInstrument);
+            this.saveSettings();
 
             // Show/hide guitar tuning selector
             const guitarTuningGroup = document.getElementById('guitar-tuning-group');
@@ -209,6 +217,7 @@ const App = {
         const guitarTuningSelect = document.getElementById('guitar-tuning');
         guitarTuningSelect.addEventListener('change', (e) => {
             Fretboard.setGuitarTuning(e.target.value);
+            this.saveSettings();
             if (this.currentMode === 'fretboard') {
                 this.renderFretboards();
             } else {
@@ -339,6 +348,29 @@ const App = {
             } else {
                 orientationGroup.style.display = 'none';
             }
+        });
+
+        // Theme Menu Logic
+        const themeBtn = document.getElementById('theme-btn');
+        const themeMenu = document.getElementById('theme-menu');
+
+        themeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeMenu.classList.toggle('visible');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.theme-wrapper')) {
+                themeMenu.classList.remove('visible');
+            }
+        });
+
+        themeMenu.querySelectorAll('.theme-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                this.setTheme(theme);
+                themeMenu.classList.remove('visible');
+            });
         });
     },
 
@@ -1320,6 +1352,110 @@ const App = {
             augmented: 'aug'
         };
         return abbrs[type] || '';
+    },
+
+    /**
+     * Set the application theme
+     */
+    setTheme(themeName) {
+        this.currentTheme = themeName;
+        document.body.className = ''; // Clear existing classes
+        if (themeName !== 'default') {
+            document.body.classList.add(themeName);
+        }
+        
+        // Update active state in menu
+        document.querySelectorAll('.theme-option').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === themeName);
+        });
+
+        this.saveSettings();
+        this.updateFavicon();
+    },
+
+    /**
+     * Save user settings to localStorage
+     */
+    saveSettings() {
+        const settings = {
+            instrument: this.currentInstrument,
+            guitarTuning: Fretboard.currentGuitarTuning,
+            theme: this.currentTheme
+        };
+        localStorage.setItem('fretforge_settings', JSON.stringify(settings));
+    },
+
+    /**
+     * Load user settings from localStorage
+     */
+    loadSettings() {
+        const saved = localStorage.getItem('fretforge_settings');
+        if (saved) {
+            try {
+                const settings = JSON.parse(saved);
+                
+                // Apply Theme
+                if (settings.theme) {
+                    this.setTheme(settings.theme);
+                }
+
+                // Apply Instrument
+                if (settings.instrument) {
+                    this.currentInstrument = settings.instrument;
+                    document.getElementById('instrument').value = settings.instrument;
+                    Fretboard.setInstrument(settings.instrument);
+                }
+
+                // Apply Tuning
+                if (settings.guitarTuning) {
+                    Fretboard.setGuitarTuning(settings.guitarTuning);
+                    document.getElementById('guitar-tuning').value = settings.guitarTuning;
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        }
+    },
+
+    /**
+     * Update favicon to match current theme color
+     */
+    async updateFavicon() {
+        try {
+            // Get current logo color from CSS variable
+            const computedStyle = getComputedStyle(document.body);
+            let color = computedStyle.getPropertyValue('--logo-color').trim();
+            
+            // Fallback if empty
+            if (!color) color = '#f4a460';
+
+            // Fetch SVG if not cached
+            if (!this.logoSvgContent) {
+                const response = await fetch('logo.svg');
+                if (!response.ok) return;
+                this.logoSvgContent = await response.text();
+            }
+
+            // Inject fill color
+            let newSvg = this.logoSvgContent;
+            if (newSvg.includes('fill=')) {
+                newSvg = newSvg.replace(/fill="[^"]*"/, `fill="${color}"`);
+            } else {
+                newSvg = newSvg.replace('<svg', `<svg fill="${color}"`);
+            }
+
+            // Update link tag
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = `data:image/svg+xml,${encodeURIComponent(newSvg)}`;
+
+        } catch (e) {
+            console.warn('Could not update favicon:', e);
+        }
     }
 };
 
