@@ -441,8 +441,8 @@ const MIDIPlayer = {
                 return;
             }
 
-            const noteDelay = duration / midiNotes.length;
-            const noteDuration = noteDelay * 1.2; // Slight overlap
+            const noteDelay = duration / 4;
+            const noteDuration = noteDelay;
 
             if (instrument === 'mandolin') {
                 const courseDelay = 0.01; // Very tight delay for mandolin courses
@@ -484,7 +484,7 @@ const MIDIPlayer = {
                 } else if (playbackMode === 'strum') {
                     this.playChordStrum(chord, instrument, chordDuration * 0.9);
                 } else if (playbackMode === 'arpeggio') {
-                    this.playChordArpeggio(chord, instrument, chordDuration * 2.7);
+                    this.playChordArpeggio(chord, instrument, chordDuration);
                 }
             }, delay * 1000);
         }
