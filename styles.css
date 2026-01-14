@@ -1609,6 +1609,7 @@ input[type="checkbox"] {
 
     .app-header {
         grid-column: 1;
+        grid-row: 1;
         padding: 4px 8px;
         border: none;
         background: transparent;
@@ -1616,6 +1617,7 @@ input[type="checkbox"] {
 
     .top-row-controls {
         grid-column: 2;
+        grid-row: 1;
         justify-content: flex-end;
         gap: 8px;
     }
@@ -1630,6 +1632,7 @@ input[type="checkbox"] {
     /* Mode Toggle - Full Width Row */
     .mode-toggle {
         grid-column: 1 / -1;
+        grid-row: 2;
         display: grid;
         grid-template-columns: 1fr 1fr;
         width: 100%;
